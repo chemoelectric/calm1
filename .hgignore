@@ -1,2 +1,6 @@
 .*~$
 .*\.orig$
+
+^calm1$
+^calm1\.(build|install)\.sh$
+^calm1-lib\..*\.(o|so|link|import.scm)$

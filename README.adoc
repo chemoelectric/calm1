@@ -1,4 +1,65 @@
-== calm1: a macro-preprocessor whose goal is to reduce your anxieties
+== calm1: a macro-preprocessor to reduce your anxieties
 
-This macroprocessor runs in R⁷RS Scheme.
+This macroprocessor runs in R⁷RS Scheme. The accompanying GNUmakefile
+is for building and installing with CHICKEN 6. The source code can
+easily be included with a project, to be run in an interpreter such as
+Gauche or Chibi.
+
+[cols="2,3"]
+|===
+|+(@ eval FORM ...)+  +
++(@ hide FORM ...)+  +
++(@ dnl FORM ...)+
+
+|Evaluate +FORM+{nbsp}+...+ as Scheme. The “+eval+” version expands
+ the results, whereas “+hide+” does not. The “+dnl+” version not only
+ hides the results, it deletes text up through the next newline.
+
+|+(@ when PREDICATE FORM ...)+  +
++(@ unless PREDICATE FORM ...)+
+
+|For “+when+”, re-insert the evaluated results of +FORM+{nbsp}+...+ if
+ +PREDICATE+ evaluates as true in Scheme. For “+unless+”, reverse the
+ sense of the +PREDICATE+.
+
+|+(@ if FORM ...)+  +
++(@ while FORM ...)+
+
+|Nondeterministic branching and looping. True branches are converted
+ to strings if possible, and re-inserted. (You can write deterministic
+ branching and looping by putting the logic in Scheme code.)
+
+|+(@ include-raw FORM ...)+  +
++(@ include FORM ...)+
+
+|Include the files specified by +FORM+{nbsp}+...+. The “+include-raw+”
+ version outputs the file contents verbatim. The “+include+” version
+ inserts the file contents into the macroprocessing stream.
+
+|+(@ define MACRO-NAME MACRO-BODY)+  +
++(@ pushdef MACRO-NAME MACRO-BODY)+
+
+|Define a macro with the name given by the form +MACRO-NAME+ and
+ definition by the form +MACRO-BODY+, which (in the current
+ implementation) must evaluate to a string. When a macro call is made,
+ +MACRO-BODY+ is inserted and then evaluated recursively. The
+ “+define+” version pops any top definition of the macro, whereas
+ “+pushdef+” does not.
+
+|+(@ popdef MACRO-NAME ...)+
+
+|Pop definitions.
+
+|+(@ undefine MACRO-NAME ...)+
+
+|Remove all definitions corresponding to the given macro names.
+
+|+(get-macro-handler MACRO-NAME)+
+
+|Scheme to return the macro handler for +MACRO-NAME+. This macro
+ handler can be used as the +MACRO-BODY+ for +(@ define ...)+ or +(@
+ pushdef ...)+.
+
+|===
+
 

@@ -445,12 +445,10 @@
       ;; (@ if FORM ...)
       ;; (@ while FORM ...)
       ;;
-      ;; Nondeterministic branching and looping. (These let you write
-      ;; deterministic branching and looping by putting the logic in
-      ;; the Scheme code.)
-      ;;
-      ;; True branches are converted to strings if possible, and
-      ;; re-inserted.
+      ;; Nondeterministic branching and looping. True branches are
+      ;; converted to strings if possible, and re-inserted. (You can
+      ;; write deterministic branching and looping by putting the
+      ;; logic in Scheme code.)
       ;;
 
       (define-syntax if-or-while-handler

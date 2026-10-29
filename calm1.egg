@@ -2,6 +2,7 @@
  (synopsis "calm1: a macro-preprocessor whose goal is to reduce your anxieties")
  (version "1.0.0")
  (dependencies srfi-1 srfi-14 srfi-37 srfi-143 r6rs-bytevectors)
+ (test-dependencies test scsh-process)
  (components
   (extension calm1-lib.version
              (source "calm1-lib/version.sld"))

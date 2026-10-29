@@ -31,8 +31,7 @@
           (scheme read)
           (scheme write)
           (scheme process-context)
-          (scheme eval)
-          (calm1-lib version))
+          (scheme eval))
 
   (import (srfi 37)) ;; args-fold
 
@@ -63,7 +62,8 @@
     ((library (srfi 143)) (import (srfi 143)))
     (else (import (srfi srfi-143))))
 
-  (import (calm1-lib utf32-string)
+  (import (calm1-lib version)
+          (calm1-lib utf32-string)
           (calm1-lib snobol-match)
           (calm1-lib snobol-char-set)
           (calm1-lib random-fixnum)

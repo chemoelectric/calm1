@@ -21,24 +21,28 @@
              (source "calm1-lib/preprocessor-define-lookup.sld"))
   (extension calm1-lib.preprocessor-macro-handler
              (source "calm1-lib/preprocessor-macro-handler.sld")
-             (component-dependencies calm1-lib.utf32-string
-                                     calm1-lib.define-record-factory
-                                     calm1-lib.preprocessor-define-lookup))
+             (component-dependencies
+              calm1-lib.define-record-factory
+              calm1-lib.utf32-string
+              calm1-lib.preprocessor-define-lookup))
   (extension calm1-lib.preprocessor-variables
              (source "calm1-lib/preprocessor-variables.sld"))
   (extension calm1-lib.main
              (source "calm1-lib/main.sld")
-             (component-dependencies calm1-lib.version))
+             (component-dependencies
+              calm1-lib.version
+              calm1-lib.utf32-string
+              calm1-lib.snobol-match
+              calm1-lib.snobol-char-set
+              calm1-lib.random-fixnum
+              calm1-lib.define-record-factory
+              calm1-lib.preprocessor-variables
+              calm1-lib.preprocessor-macro-handler
+              calm1-lib.preprocessor-define-lookup))
   (program calm1
            (source "calm1.scm")
-           (component-dependencies calm1-lib.main
-                                   calm1-lib.preprocessor-variables
-                                   calm1-lib.preprocessor-macro-handler
-                                   calm1-lib.preprocessor-define-lookup
-                                   calm1-lib.snobol-char-set
-                                   calm1-lib.snobol-match
-                                   calm1-lib.random-fixnum))
-  ))
+           (component-dependencies
+            calm1-lib.main)) ))
 
 ;;; local variables:
 ;;; mode: scheme

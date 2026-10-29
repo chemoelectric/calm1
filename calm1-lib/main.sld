@@ -70,7 +70,8 @@
           (calm1-lib define-record-factory)
           (calm1-lib preprocessor-variables)
           (calm1-lib preprocessor-macro-handler)
-          (calm1-lib preprocessor-define-lookup))
+          (calm1-lib preprocessor-define-lookup)
+          (calm1-lib path-list))
 
   (export main)
 
@@ -114,7 +115,8 @@
         '(calm1-lib preprocessor-variables)
         '(calm1-lib define-record-factory)
         '(calm1-lib preprocessor-macro-handler)
-        '(calm1-lib preprocessor-define-lookup))))
+        '(calm1-lib preprocessor-define-lookup)
+        '(calm1-lib path-list))))
 
     (define *program-name* (make-parameter #f))
 
@@ -718,6 +720,12 @@
                (set! t (utf32-string-copy t 1))
                (loop)))))
 
+    (define (find-and-open-input-file input-file)
+      (let ((path (search-calm1-path-list input-file)))
+        (if path
+          (open-input-file path)
+          (error "file not found" input-file))))
+
     (define (run-the-program definitions input-files output-file)
       (let* ((use-stdout? (string=? output-file "-"))
              (output-port (if use-stdout?
@@ -730,7 +738,7 @@
                  (use-stdin? (string=? input-file "-"))
                  (input-port (if use-stdin?
                                (current-input-port)
-                               (open-input-file input-file))))
+                               (find-and-open-input-file input-file))))
             (let ((text (read-to-string input-port)))
               (set! texts (append! texts (list text))))
             (unless use-stdin?
@@ -1023,6 +1031,12 @@
         (display "                output version information and exit\n"
                  port)
 
+        (display "\n\n" port)
+        (display "If defined, the environment variable “CALM1_PATH” is \
+                  a colon-separated\nlist of directories to search \
+                  for input files. Otherwise the current\nworking \
+                  directory is searched.\n" port)
+
         (exit exit-status)))
 
     (define (version-handler exit-status)
@@ -1030,7 +1044,7 @@
         (display (*program-name*) port)
         (display " (" port)
         (display "anxiety reduction by text generation" port)
-        (display ")\nversion " port)
+        (display ") version " port)
         (display version port)
         (display "\n" port)
         (display "\nCopyright © 2026 Barry Schwartz\n" port)

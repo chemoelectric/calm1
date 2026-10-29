@@ -27,6 +27,8 @@
               calm1-lib.preprocessor-define-lookup))
   (extension calm1-lib.preprocessor-variables
              (source "calm1-lib/preprocessor-variables.sld"))
+  (extension calm1-lib.path-list
+             (source "calm1-lib/path-list.sld"))
   (extension calm1-lib.main
              (source "calm1-lib/main.sld")
              (component-dependencies
@@ -38,7 +40,8 @@
               calm1-lib.define-record-factory
               calm1-lib.preprocessor-variables
               calm1-lib.preprocessor-macro-handler
-              calm1-lib.preprocessor-define-lookup))
+              calm1-lib.preprocessor-define-lookup
+              calm1-lib.path-list))
   (program calm1
            (source "calm1.scm")
            (component-dependencies

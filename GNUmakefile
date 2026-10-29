@@ -36,10 +36,22 @@ all:: calm1
 %: %.in
 	$(SED) -e 's/@VERSION@/$(VERSION)/g' < $(<) > $(@).tmp
 	mv $(@){.tmp,}
-
-calm1: calm1.egg calm1-lib/version.sld
-	$(CHICKEN_INSTALL) -n
 veryclean:: ; -rm -f calm1.egg calm1-lib/version.sld
+
+calm1: calm1.egg \
+		calm1.scm \
+		calm1-lib/version.sld \
+		calm1-lib/define-record-factory.sld \
+		calm1-lib/random-fixnum.sld \
+		calm1-lib/utf32-string.sld \
+		calm1-lib/snobol-match.sld \
+		calm1-lib/snobol-char-set.sld \
+		calm1-lib/preprocessor-define-lookup.sld \
+		calm1-lib/preprocessor-macro-handler.sld \
+		calm1-lib/preprocessor-variables.sld \
+		calm1-lib/path-list.sld \
+		calm1-lib/main.sld
+	$(CHICKEN_INSTALL) -n
 
 .PHONY: install
 install:: calm1

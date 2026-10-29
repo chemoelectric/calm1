@@ -20,7 +20,7 @@
 # SOFTWARE.
 
 .DELETE_ON_ERROR:
-.DEFAULT_GOAL := 
+.DEFAULT_GOAL := default
 
 VERSION = 1.0.0
 

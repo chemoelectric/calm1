@@ -1,0 +1,4 @@
+== calm1: a macro-preprocessor whose goal is to reduce your anxieties
+
+This macroprocessor runs in R⁷RS Scheme.
+

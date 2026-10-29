@@ -51,6 +51,6 @@ uninstall::
 
 clean::
 	-rm -f calm1
-	-rm -f *.{o,so,link,import.scm}
 	-rm -f calm1.build.sh
 	-rm -f calm1.install.sh
+	-rm -f calm1-lib.*.{o,so,link,import.scm}

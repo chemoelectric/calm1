@@ -25,14 +25,32 @@
 VERSION = 1.0.0
 
 SED = sed
+CHICKEN_INSTALL = chicken-install
+CHICKEN_UNINSTALL = chicken-uninstall
 
 .PHONY: default all clean veryclean
 default: all
 
-all:: calm1.egg calm1-lib/version.sld
-veryclean:: ; -rm -f calm1.egg calm1-lib/version.sld
+all:: calm1
 
 %: %.in
 	$(SED) -e 's/@VERSION@/$(VERSION)/g' < $(<) > $(@).tmp
 	mv $(@){.tmp,}
 
+calm1: calm1.egg calm1-lib/version.sld
+	$(CHICKEN_INSTALL) -n
+veryclean:: ; -rm -f calm1.egg calm1-lib/version.sld
+
+.PHONY: install
+install:: calm1
+	$(CHICKEN_INSTALL) -s
+
+.PHONY: uninstall
+uninstall::
+	$(CHICKEN_UNINSTALL) -s -force calm1
+
+clean::
+	-rm -f calm1
+	-rm -f *.{o,so,link,import.scm}
+	-rm -f calm1.build.sh
+	-rm -f calm1.install.sh

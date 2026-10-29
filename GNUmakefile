@@ -61,6 +61,10 @@ install:: calm1
 uninstall::
 	$(CHICKEN_UNINSTALL) -s -force calm1
 
+.PHONY: test install-check
+test install-check::
+	$(CHICKEN_INSTALL) -s -test
+
 clean::
 	-rm -f calm1
 	-rm -f calm1.build.sh

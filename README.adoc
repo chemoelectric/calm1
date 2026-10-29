@@ -60,6 +60,11 @@ Gauche or Chibi.
  handler can be used as the +MACRO-BODY+ for +(@ define ...)+ or +(@
  pushdef ...)+.
 
+|++($a := (* ($a) (+ ($b) 1)))++
+
+|Scheme operations using variables. Predefined variables include +$a+
+ to +$z+ and +$A+ to +$Z+.
+
 |===
 
 

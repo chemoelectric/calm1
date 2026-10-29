@@ -31,7 +31,8 @@
           (scheme read)
           (scheme write)
           (scheme process-context)
-          (scheme eval))
+          (scheme eval)
+          (calm1-lib version))
 
   (import (srfi 37)) ;; args-fold
 
@@ -1029,7 +1030,9 @@
         (display (*program-name*) port)
         (display " (" port)
         (display "anxiety reduction by text generation" port)
-        (display ")\nexperimental version (●)\n" port)
+        (display ")\nversion " port)
+        (display version port)
+        (display "\n" port)
         (display "\nCopyright © 2026 Barry Schwartz\n" port)
         (display "\n\
 Permission is hereby granted, free of charge, to any person\n\

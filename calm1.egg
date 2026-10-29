@@ -1,0 +1,47 @@
+((author "Barry Schwartz")
+ (synopsis "calm1: a macro-preprocessor whose goal is to reduce your anxieties")
+ (version "1.0.0")
+ (dependencies srfi-1 srfi-14 srfi-37 srfi-143 r6rs-bytevectors)
+ (components
+  (extension calm1-lib.version
+             (source "calm1-lib/version.sld"))
+  (extension calm1-lib.define-record-factory
+             (source "calm1-lib/define-record-factory.sld"))
+  (extension calm1-lib.random-fixnum
+             (source "calm1-lib/random-fixnum.sld"))
+  (extension calm1-lib.utf32-string
+             (source "calm1-lib/utf32-string.sld"))
+  (extension calm1-lib.snobol-match
+             (source "calm1-lib/snobol-match.sld")
+             (component-dependencies calm1-lib.utf32-string))
+  (extension calm1-lib.snobol-char-set
+             (source "calm1-lib/snobol-char-set.sld")
+             (component-dependencies calm1-lib.utf32-string))
+  (extension calm1-lib.preprocessor-define-lookup
+             (source "calm1-lib/preprocessor-define-lookup.sld"))
+  (extension calm1-lib.preprocessor-macro-handler
+             (source "calm1-lib/preprocessor-macro-handler.sld")
+             (component-dependencies calm1-lib.utf32-string
+                                     calm1-lib.define-record-factory
+                                     calm1-lib.preprocessor-define-lookup))
+  (extension calm1-lib.preprocessor-variables
+             (source "calm1-lib/preprocessor-variables.sld"))
+  (extension calm1-lib.main
+             (source "calm1-lib/main.sld")
+             (component-dependencies calm1-lib.version))
+  (program calm1
+           (source "calm1.scm")
+           (component-dependencies calm1-lib.main
+                                   calm1-lib.preprocessor-variables
+                                   calm1-lib.preprocessor-macro-handler
+                                   calm1-lib.preprocessor-define-lookup
+                                   calm1-lib.snobol-char-set
+                                   calm1-lib.snobol-match
+                                   calm1-lib.random-fixnum))
+  ))
+
+;;; local variables:
+;;; mode: scheme
+;;; geiser-scheme-implementation: chicken
+;;; end:
+

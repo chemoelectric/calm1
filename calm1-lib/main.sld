@@ -957,12 +957,13 @@
                  port)
 
         (display "      --nondeterministic" port)
-        (display "       nondeterministic “if”, “while” [default]\n"
+        (display "       nondeterministic “if”, “while” (default)\n"
                  port)
 
         (display "      --comment-style=STYLE" port)
         (display "    styles:\n" port)
-        (display "                                 '', none\n" port)
+        (display "                                 '', none (default)\n"
+                 port)
         (display "                                 scheme, r6rs, r7rs\n"
                  port)
 

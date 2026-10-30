@@ -127,6 +127,26 @@
         ((¶)
          (if #f #f))))
 
+;;;---------------------------------------------------------------------
+
+    (define (find-and-open-input-file input-file)
+      (let ((path (search-calm1-path-list input-file)))
+        (if path
+          (open-input-file path)
+          (error "file not found" input-file))))
+
+    (define (find-file-and-use-it-for-input input-file thunk)
+      (let ((port (find-and-open-input-file input-file)))
+        (dynamic-wind
+          (lambda () #f)
+          (lambda ()
+            (parameterize ((current-input-port port))
+              (thunk)))
+          (lambda ()
+            (close-input-port port)))))
+
+;;;---------------------------------------------------------------------
+
     (define (utf32-string? obj)
       ;;
       ;; FIXME: This will suffice unless we put a proper first-class
@@ -307,15 +327,15 @@
                  (when match-result
                    (let ((n (utf32-string->number
                              (getvar 'cursor match-result))))
-                     (shorten n)))))))))
+                     (@drop n)))))))))
 
       ;;----------------------------------------------------
       ;; (@ when PREDICATE FORM ...)
       ;; (@ unless PREDICATE FORM ...)
       ;;
-      ;; For “when”, re-insert the evaluated results of FORM ... if
-      ;; PREDICATE evaluates as true in Scheme. For “unless”, reverse
-      ;; the sense of the PREDICATE.
+      ;; For “when”, if PREDICATE evaluates as true in Scheme,
+      ;; evaluate each of FORM ... For “unless”, reverse the sense of
+      ;; the PREDICATE.
       ;;
 
       (define-syntax when-or-unless-handler
@@ -331,7 +351,7 @@
                   (do ((p (reverse forms) (cdr p)))
                       ((null? p))
                     (set! str (string-append (car p) str))))
-                 (reinsert str)))))))
+                 (@in str)))))))
 
       (define when-handler
         (make-macro-handler
@@ -400,11 +420,10 @@
                        ;; Reinsert both the expansion and the
                        ;; (@ while ...)
                        (lambda ignored
-                         (reinsert
-                          (utf32-string-append
-                           macro-open
-                           macro-name one-space macro-body
-                           macro-close))))
+                         (@in (utf32-string-append
+                               macro-open
+                               macro-name one-space macro-body
+                               macro-close))))
                       (else
                        (loop (- i 1))))))))))
 
@@ -420,7 +439,7 @@
            (let-values ((filenames (evaluate macro-body)))
              (do ((f filenames (cdr f)))
                  ((null? f))
-               (with-input-from-file (car f)
+               (find-file-and-use-it-for-input (car f)
                  (lambda ()
                    (output-to-port (read-to-string)))))))))
 
@@ -436,9 +455,9 @@
            (let-values ((filenames (evaluate macro-body)))
              (do ((f (reverse filenames) (cdr f)))
                  ((null? f))
-               (with-input-from-file (car f)
+               (find-file-and-use-it-for-input (car f)
                  (lambda ()
-                   (reinsert (read-to-string)))))))))
+                   (@in (read-to-string)))))))))
 
       ;;----------------------------------------------------
       ;; (@ define MACRO-NAME MACRO-BODY)
@@ -457,17 +476,17 @@
         (let ((before (->utf32 "(@ popdef \""))
               (after (->utf32 "\")")))
           (lambda (i)
-            (reinsert (utf32-string-append
-                       before (number->utf32-string i) after)))))
+            (@in (utf32-string-append
+                  before (number->utf32-string i) after)))))
 
       (define reinsert-pushdef-i!
         (let ((before (->utf32 "(@ pushdef \""))
               (between (->utf32 "\" "))
               (after (->utf32 ")")))
           (lambda (i value)
-            (reinsert (utf32-string-append
-                       before (number->utf32-string i)
-                       between (serialize value) after)))))
+            (@in (utf32-string-append
+                  before (number->utf32-string i)
+                  between (serialize value) after)))))
 
       (define-syntax define-macro
         (syntax-rules ()
@@ -490,7 +509,7 @@
                        (do ((i 1 (+ i 1)))
                            ((= i (+ n 1)))
                          (reinsert-popdef-i! i))
-                       (reinsert body)
+                       (@in body)
                        (reinsert-pushdef-i! 0 name)
                        (do ((i 1 (+ i 1))
                             (p vals (cdr p)))
@@ -627,14 +646,8 @@
               (else
                (output-to-port (utf32-string-copy
                                 (preprocessor-text) 0 1))
-               (shorten 1)
+               (@drop 1)
                (loop)))))
-
-    (define (find-and-open-input-file input-file)
-      (let ((path (search-calm1-path-list input-file)))
-        (if path
-          (open-input-file path)
-          (error "file not found" input-file))))
 
     (define (run-the-program comment-style definitions
                              input-files output-file)

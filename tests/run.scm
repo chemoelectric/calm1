@@ -37,13 +37,13 @@
     (test "7" (run/string
                (calm1 -)
                (<< "(@ hide ($x := 4)($y := 3)\
-                            (reinsert (+ ($x) ($y))))")))
+                            (@in (+ ($x) ($y))))")))
     (test "7" (run/string
                (calm1 -)
                (<< "(@ dnl ($a := (+ 4 3)))discard\n(@ eval ($a))")))
     (test "567" (run/string
                  (calm1 -)
-                 (<< "(@ dnl (raw-text \"56\")\
+                 (<< "(@ dnl (@out \"56\")\
                       ($a := (+ 4 3)))discard\n\
                       (@ eval ($a))")))
     )
@@ -51,43 +51,56 @@
   (test-group "when, unless"
     (test "1234" (run/string
                   (calm1 -)
-                  (<< "(@ when #t (number->string 1) \"23\" \"4\")")))
+                  (<< "(@ when #t (number->string 1) \
+                                   \"23\" \"4\")")))
     (test "" (run/string
               (calm1 -)
-              (<< "(@ when #f (number->string 1) \"23\" \"4\")")))
+              (<< "(@ when #f (number->string 1) \
+                               \"23\" \"4\")")))
     (test "1234" (run/string
                   (calm1 -)
-                  (<< "(@ unless #f (number->string 1) \"23\" \"4\")")))
+                  (<< "(@ unless #f (number->string 1) \
+                                     \"23\" \"4\")")))
     (test "" (run/string
               (calm1 -)
-              (<< "(@ unless #t (number->string 1) \"23\" \"4\")")))
+              (<< "(@ unless #t (number->string 1) \
+                                 \"23\" \"4\")")))
     )
 
   (test-group "if, while"
     (test "3" (run/string
                (calm1 -)
                (<< "(@ hide ($A := 3))\
-                    (@ if (and (= ($A) 1) (reinsert \"1\"))\
-                          (and (= ($A) 2) (reinsert \"2\"))\
-                          (and (= ($A) 3) (reinsert \"3\"))\
-                          (and (= ($A) 4) (reinsert \"4\")))")))
+                    (@ if (and (= ($A) 1) (@in \"1\"))\
+                          (and (= ($A) 2) (@in \"2\"))\
+                          (and (= ($A) 3) (@in \"3\"))\
+                          (and (= ($A) 4) (@in \"4\")))")))
     (test "2222211111=>1111122222"
           (run/string
            (calm1 -)
            (<< "(@ hide ($A := 1)($S := \"\"))\
                 (@ while (and (<= 1 ($A)) (<= ($A) 5) \
                               (begin \
-                                (reinsert 1) \
+                                (@in 1) \
                                 ($S := (string-append ($S) \"1\")) \
                                 ($A := (+ ($A) 1)) #t)) \
                          (and (<= 6 ($A)) (<= ($A) 10) \
                               (begin \
-                                (reinsert 2) \
+                                (@in 2) \
                                 ($S := (string-append ($S) \"2\")) \
                                 ($A := (+ ($A) 1)) #t)))=>\
-                (@ hide (reinsert ($S)))")))
+                (@ hide (@in ($S)))")))
     )
-  
+
+  (test-group "include-raw, include"
+    (let ((text (run/string
+                 (calm1 -) (<< "(@ include-raw \"run.scm\")")))
+          (nominal (run/string (cat run.scm))))
+      (test-assert "include-raw"(string=? text nominal)))
+    (test "7" (run/string
+               (calm1 -) (<< "(@ include \"inclusion.txt\")")))
+    )
+
   )
 
 (test-exit)

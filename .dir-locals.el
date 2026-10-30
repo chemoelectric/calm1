@@ -10,5 +10,6 @@
               (eval . (put 'with-syntax 'scheme-indent-function 1))
               (eval . (put 'stream-lambda 'scheme-indent-function 1))
               (eval . (put 'test-equal 'scheme-indent-function 1))
+              (eval . (put 'find-file-and-use-it-for-input 'scheme-indent-function 1))
               (geiser-scheme-implementations . chicken)
               ))

@@ -36,9 +36,9 @@
 
   (export preprocessor-text
           set-preprocessor-text!
-          shorten
-          reinsert
-          raw-text
+          @drop
+          @in
+          @out
           preprocessor-serialize
           preprocessor-stringize
           preprocessor-read-to-string
@@ -64,13 +64,13 @@
     (define (preprocessor-text)
       (car (*preprocessor-text*)))
 
-    (define (shorten n)
+    (define (@drop n)
       (let* ((text (preprocessor-text))
              (len (min n (utf32-string-length text))))
         (set-preprocessor-text!
          (utf32-string-copy text len))))
 
-    (define (reinsert str)
+    (define (@in str)
       (set-preprocessor-text!
        (utf32-string-append (preprocessor-stringize str)
                             (preprocessor-text))))
@@ -123,7 +123,7 @@
            (chars->comment-brackets (preprocessor-stringize obj)))
           port))))
 
-    (define raw-text preprocessor-display-as-string)
+    (define @out preprocessor-display-as-string)
 
 ;;;---------------------------------------------------------------------
 

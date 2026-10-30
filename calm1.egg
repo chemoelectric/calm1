@@ -2,7 +2,6 @@
  (synopsis "calm1: a macro-preprocessor whose goal is to reduce your anxieties")
  (version "1.0.0")
  (dependencies srfi-1 srfi-14 srfi-37 srfi-143 r6rs-bytevectors)
- (test-dependencies test scsh-process)
  (components
   (extension calm1-lib.version
              (source "calm1-lib/version.sld"))
@@ -28,6 +27,9 @@
               calm1-lib.preprocessor-define-lookup))
   (extension calm1-lib.preprocessor-variables
              (source "calm1-lib/preprocessor-variables.sld"))
+  (extension calm1-lib.preprocessor-text
+             (source "calm1-lib/preprocessor-text.sld")
+             (component-dependencies calm1-lib.utf32-string))
   (extension calm1-lib.path-list
              (source "calm1-lib/path-list.sld"))
   (extension calm1-lib.main
@@ -42,6 +44,7 @@
               calm1-lib.preprocessor-variables
               calm1-lib.preprocessor-macro-handler
               calm1-lib.preprocessor-define-lookup
+              calm1-lib.preprocessor-text
               calm1-lib.path-list))
   (program calm1
            (source "calm1.scm")

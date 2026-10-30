@@ -71,6 +71,7 @@
           (calm1-lib preprocessor-variables)
           (calm1-lib preprocessor-macro-handler)
           (calm1-lib preprocessor-define-lookup)
+          (calm1-lib preprocessor-text)
           (calm1-lib path-list))
 
   (export main)
@@ -116,6 +117,7 @@
         '(calm1-lib define-record-factory)
         '(calm1-lib preprocessor-macro-handler)
         '(calm1-lib preprocessor-define-lookup)
+        '(calm1-lib preprocessor-text)
         '(calm1-lib path-list))))
 
     (define *program-name* (make-parameter #f))
@@ -239,17 +241,10 @@
                    (*environment*)))
 
     (define (serialize obj)
-      (let ((port (open-output-string)))
-        (write obj port)
-        (string->utf32-string (get-output-string port))))
+      (preprocessor-serialize obj))
 
     (define (stringize x)
-      (cond ((utf32-string? x) x)
-            ((string? x) (string->utf32-string x))
-            ((symbol? x) (symbol->utf32-string x))
-            ((number? x) (number->utf32-string x))
-            ((char? x) (utf32-string (char->integer x)))
-            (else (serialize x))))
+      (preprocessor-stringize x))
 
     (define (getvar key match-result)
       (and match-result
@@ -355,16 +350,9 @@
 
     (define (process-text definitions text output-port)
 
-      (define t (utf32-string-copy text))
-
-      (define (shorten-t! n)
-        (set! t (utf32-string-copy t n)))
-
       (define (remove-t-prefix! prefix)
-        (set! t (remove-prefix (stringize prefix) t)))
-
-      (define (reinsert! str)
-        (set! t (utf32-string-append (stringize str) t)))
+        (set-preprocessor-text!
+         (remove-prefix (stringize prefix) (preprocessor-text))))
 
       (define (output-to-port obj)
         (display-as-string obj output-port))
@@ -401,11 +389,12 @@
           (make-macro-handler
            (lambda (macro-call macro-name macro-body)
              (let-values ((form-lst (evaluate macro-body)))
-               (let ((match-result (snobol-match pattern t)))
+               (let ((match-result
+                      (snobol-match pattern (preprocessor-text))))
                  (when match-result
                    (let ((n (utf32-string->number
                              (getvar 'cursor match-result))))
-                     (shorten-t! n)))))))))
+                     (shorten! n)))))))))
 
       ;;----------------------------------------------------
       ;; (@ when PREDICATE FORM ...)
@@ -445,10 +434,12 @@
       ;; (@ if FORM ...)
       ;; (@ while FORM ...)
       ;;
-      ;; Nondeterministic branching and looping. True branches are
-      ;; converted to strings if possible, and re-inserted. (You can
-      ;; write deterministic branching and looping by putting the
-      ;; logic in Scheme code.)
+      ;; Nondeterministic branching and looping. These do not reinsert
+      ;; anything automatically, because it would be difficult to
+      ;; control reinsertion (especially by “while”) if they did.
+      ;; Incidentally, you can make the branching and looping
+      ;; deterministic by putting the all the logic in Scheme code
+      ;; within a single macro-branch.
       ;;
 
       (define-syntax if-or-while-handler
@@ -478,8 +469,8 @@
                 (cond ((= i -1)
                        (error "no case is satisfied" forms))
                       ((vector-ref v i) =>
-                       (lambda (x)
-                         (reinsert! (stringize x))))
+                       (lambda ignored
+                         (unspecified-value)))
                       (else
                        (loop (- i 1))))))))))
 
@@ -495,13 +486,12 @@
                       ((vector-ref v i) =>
                        ;; Reinsert both the expansion and the
                        ;; (@ while ...)
-                       (lambda (x)
+                       (lambda ignored
                          (reinsert!
                           (utf32-string-append
                            macro-open
                            macro-name one-space macro-body
-                           macro-close))
-                         (reinsert! (stringize x))))
+                           macro-close))))
                       (else
                        (loop (- i 1))))))))))
 
@@ -680,6 +670,7 @@
                                     (serialize macro-body)))
               (remove-macro-handlers! macro-name)))))
 
+      (set-preprocessor-text! (utf32-string-copy text))
       (set-macro-handler! "dnl" dnl-handler)
       (set-macro-handler! "eval" eval-handler)
       (set-macro-handler! "hide" hide-handler)
@@ -696,27 +687,32 @@
 
       (apply-definitions-list definitions)
       (let loop ()
-        (cond ((= 0 (utf32-string-length t))
+        (cond ((= 0 (utf32-string-length (preprocessor-text)))
                (unspecified-value))
-              ((snobol-match (*quick-pattern*) t) =>
-               (lambda (match-result)
-                 (handle-quick-result match-result)
-                 (loop)))
-              ((snobol-match (*macro-pattern*) t) =>
-               (lambda (match-result)
-                 (handle-macro-call match-result)
-                 (loop)))
-              ((snobol-match (*form-comment-pattern*) t) =>
-               (lambda (match-result)
-                 (handle-form-comment match-result)
-                 (loop)))
-              ((snobol-match (*line-comment-pattern*) t) =>
-               (lambda (match-result)
-                 (handle-line-comment match-result)
-                 (loop)))
+              ((snobol-match (*quick-pattern*)
+                             (preprocessor-text)) =>
+                             (lambda (match-result)
+                               (handle-quick-result match-result)
+                               (loop)))
+              ((snobol-match (*macro-pattern*)
+                             (preprocessor-text)) =>
+                             (lambda (match-result)
+                               (handle-macro-call match-result)
+                               (loop)))
+              ((snobol-match (*form-comment-pattern*)
+                             (preprocessor-text)) =>
+                             (lambda (match-result)
+                               (handle-form-comment match-result)
+                               (loop)))
+              ((snobol-match (*line-comment-pattern*)
+                             (preprocessor-text)) =>
+                             (lambda (match-result)
+                               (handle-line-comment match-result)
+                               (loop)))
               (else
-               (output-to-port (utf32-string-copy t 0 1))
-               (set! t (utf32-string-copy t 1))
+               (output-to-port (utf32-string-copy
+                                (preprocessor-text) 0 1))
+               (shorten! 1)
                (loop)))))
 
     (define (find-and-open-input-file input-file)

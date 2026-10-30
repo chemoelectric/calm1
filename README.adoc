@@ -25,9 +25,11 @@ Gauche or Chibi.
 |+(@ if FORM ...)+  +
 +(@ while FORM ...)+
 
-|Nondeterministic branching and looping. True branches are converted
- to strings if possible, and re-inserted. (You can write deterministic
- branching and looping by putting the logic in Scheme code.)
+|Nondeterministic branching and looping. These do not reinsert
+ anything automatically, because it would be difficult to control
+ reinsertion (especially by “while”) if they did. Incidentally, you
+ can make the branching and looping deterministic by putting the all
+ the logic in Scheme code within a single macro-branch.
 
 |+(@ include-raw FORM ...)+  +
 +(@ include FORM ...)+

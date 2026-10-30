@@ -43,6 +43,9 @@
           preprocessor-stringize
           preprocessor-read-to-string
           preprocessor-display-as-string
+          
+          converting-scheme-comment-brackets
+          set-converting-scheme-comment-brackets!
           scheme-comment-left
           scheme-comment-right)
 
@@ -51,7 +54,7 @@
 ;;;---------------------------------------------------------------------
 
     (define *preprocessor-text*
-      (make-parameter (list '())))
+      (make-parameter (list #f)))
 
     (define (set-preprocessor-text! u32)
       (unless (utf32-string? u32)
@@ -122,6 +125,19 @@
 
     (define raw-text preprocessor-display-as-string)
 
+;;;---------------------------------------------------------------------
+
+    (define *converting-scheme-comment-brackets*
+      (make-parameter (list #f)))
+
+    (define (converting-scheme-comment-brackets)
+      (car (*converting-scheme-comment-brackets*)))
+
+    (define (set-converting-scheme-comment-brackets! bool)
+      (unless (boolean? bool)
+        (error "expected a boolean" bool))
+      (set-car! (*converting-scheme-comment-brackets*) bool))
+
     ;; "#|" and "|#" get converted to these code points, for handling
     ;; as if they were bracket characters. These code points are
     ;; chosen haphazardly from Supplemental Private Use Area-B.
@@ -129,6 +145,16 @@
     (define scheme-comment-right #\x10A632)
 
     (define (comment-brackets->chars str)
+      (if (converting-scheme-comment-brackets)
+        (comment-brackets->chars%%aux str)
+        (utf32-string-copy str)))
+
+    (define (chars->comment-brackets str)
+      (if (converting-scheme-comment-brackets)
+        (chars->comment-brackets%%aux str)
+        (utf32-string-copy str)))
+
+    (define (comment-brackets->chars%%aux str)
       ;;
       ;; Convert "#|" and "|#" to single code points in an
       ;; out-of-the-way range.
@@ -160,7 +186,7 @@
                     (else
                      (loop2 (+ j 1)))))))))
 
-    (define (chars->comment-brackets str)
+    (define (chars->comment-brackets%%aux str)
       ;;
       ;; Convert certain code points to "#|" and "|#".
       ;;

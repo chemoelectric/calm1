@@ -261,7 +261,7 @@
       ;;
       (make-parameter #f))
 
-    (define (process-text definitions text output-port)
+    (define (process-text comment-style definitions text output-port)
 
       (define (remove-t-prefix! prefix)
         (set-preprocessor-text!
@@ -612,16 +612,18 @@
                              (lambda (match-result)
                                (handle-macro-call match-result)
                                (loop)))
-              ((snobol-match (*form-comment-pattern*)
-                             (preprocessor-text)) =>
-                             (lambda (match-result)
-                               (handle-form-comment match-result)
-                               (loop)))
-              ((snobol-match (*line-comment-pattern*)
-                             (preprocessor-text)) =>
-                             (lambda (match-result)
-                               (handle-line-comment match-result)
-                               (loop)))
+              ((and (equal? comment-style "scheme")
+                    (snobol-match (*form-comment-pattern*)
+                                  (preprocessor-text))) =>
+                                  (lambda (match-result)
+                                    (handle-form-comment match-result)
+                                    (loop)))
+              ((and (equal? comment-style "scheme")
+                    (snobol-match (*line-comment-pattern*)
+                                  (preprocessor-text))) =>
+                                  (lambda (match-result)
+                                    (handle-line-comment match-result)
+                                    (loop)))
               (else
                (output-to-port (utf32-string-copy
                                 (preprocessor-text) 0 1))
@@ -634,7 +636,8 @@
           (open-input-file path)
           (error "file not found" input-file))))
 
-    (define (run-the-program definitions input-files output-file)
+    (define (run-the-program comment-style definitions
+                             input-files output-file)
       (let* ((use-stdout? (string=? output-file "-"))
              (output-port (if use-stdout?
                             (current-output-port)
@@ -652,10 +655,13 @@
             (unless use-stdin?
               (close-input-port input-port))))
         (localize-bracket-pairs
-         (set-bracket-pairs!
-          (cons (cons scheme-comment-left scheme-comment-right)
-                (bracket-pairs)))
-         (process-text definitions
+         (cond
+           ((equal? comment-style "scheme")
+            (set-converting-scheme-comment-brackets! #t)
+            (set-bracket-pairs!
+             (cons (cons scheme-comment-left scheme-comment-right)
+                   (bracket-pairs)))))
+         (process-text comment-style definitions
                        (utf32-string-concatenate texts)
                        output-port))
         (unless use-stdout?
@@ -674,6 +680,7 @@
                                    (list) ; definitions
                                    #f     ; deterministic?
                                    "-"    ; output
+                                   ""     ; comment-style
                                    ))))
 
       ;;
@@ -732,6 +739,14 @@
 
       (getter> 4 get-output)
       (setter> 4 set-output!)
+
+      (getter> 5 get-comment-style)
+      (setter> 5 set-comment-style!
+               (lambda (setter!)
+                 (lambda (obj value)
+                   (unless (string? value)
+                     (error "expected a string" value))
+                   (setter! obj value))))
 
       ) ;; end <seed>
 
@@ -836,6 +851,22 @@
           seed))
 
        (option
+        '("comment-style") #t #f
+        (lambda (opt name arg seed)
+          (cond
+            ((or (string=? arg "")
+                 (string=? arg "none"))
+             (set-comment-style! seed "")
+             seed)
+            ((or (string=? arg "scheme")
+                 (string=? arg "r6rs")
+                 (string=? arg "r7rs"))
+             (set-comment-style! seed "scheme")
+             seed)
+            (else
+             (error "unrecognized --comment-style option" arg)))))
+
+       (option
         '("help") #f #f
         (lambda (opt name arg seed)
           (usage-handler 0)))
@@ -929,6 +960,12 @@
         (display "       nondeterministic “if”, “while” [default]\n"
                  port)
 
+        (display "      --comment-style=STYLE" port)
+        (display "    styles:\n" port)
+        (display "                                 '', none\n" port)
+        (display "                                 scheme, r6rs, r7rs\n"
+                 port)
+
         (display "      --help" port)
         (display "                   display this help and exit\n"
                  port)
@@ -999,14 +1036,17 @@ OTHER DEALINGS IN THE SOFTWARE.\n"
                  (positionals (get-positionals seed))
                  (definitions (get-definitions seed))
                  (deterministic? (get-deterministic seed))
-                 (output-filename (get-output seed)))
+                 (output-filename (get-output seed))
+                 (comment-style (get-comment-style seed)))
             (check-definitions definitions)
             (parameterize ((*deterministic?* deterministic?))
               (case (length positionals)
-                ((0) (run-the-program definitions '("-")
+                ((0) (run-the-program comment-style
+                                      definitions '("-")
                                       output-filename))
-                (else (run-the-program definitions positionals
-                                       output-filename))))))))
+                (else (run-the-program comment-style
+                                       definitions positionals
+                                        output-filename))))))))
 
     ))
 

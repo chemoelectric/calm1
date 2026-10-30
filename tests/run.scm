@@ -97,7 +97,8 @@
                  (calm1 -) (<< "(@ include-raw \"run.scm\")")))
           (nominal (run/string (cat run.scm))))
       (test-assert "include-raw"(string=? text nominal)))
-    (test "7" (run/string
+    (test "include"
+          "7" (run/string
                (calm1 -) (<< "(@ include \"inclusion.txt\")")))
     )
 

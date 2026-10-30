@@ -43,8 +43,9 @@
                (<< "(@ dnl ($a := (+ 4 3)))discard\n(@ eval ($a))")))
     (test "567" (run/string
                  (calm1 -)
-                 (<< "(@ dnl (display \"56\")($a := (+ 4 3)))discard\n\
-                    (@ eval ($a))")))
+                 (<< "(@ dnl (display \"56\")\
+                      ($a := (+ 4 3)))discard\n\
+                      (@ eval ($a))")))
     )
 
   (test-group "when, unless"
@@ -74,10 +75,14 @@
           (run/string
            (calm1 -)
            (<< "(@ hide ($A := 1))\
-                (@ while (and (<= 1 ($A)) (<= ($A) 5) \
-                              (begin ($A := (+ ($A) 1)) 1)) \
+                (@ while (and (<= 1 ($A)) (<= ($A) 5)\
+(display 1)\
+                              (begin ($A := (+ ($A) 1)) #t) \
+                              \"\") \
                          (and (<= 6 ($A)) (<= ($A) 10) \
-                              (begin ($A := (+ ($A) 1)) 2)))")))
+(display 2)\
+                              (begin ($A := (+ ($A) 1)) #t) \
+                              \"\"))")))
     )
   
   )

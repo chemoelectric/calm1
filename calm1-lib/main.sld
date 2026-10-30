@@ -493,14 +493,15 @@
                 (cond ((= i -1)
                        (unspecified-value))
                       ((vector-ref v i) =>
-                       ;; Reinsert both the expansion and the (@ while ...)
+                       ;; Reinsert both the expansion and the
+                       ;; (@ while ...)
                        (lambda (x)
                          (reinsert!
                           (utf32-string-append
-                           (stringize x)
                            macro-open
                            macro-name one-space macro-body
-                           macro-close))))
+                           macro-close))
+                         (reinsert! (stringize x))))
                       (else
                        (loop (- i 1))))))))))
 

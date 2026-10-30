@@ -37,13 +37,13 @@
     (test "7" (run/string
                (calm1 -)
                (<< "(@ hide ($x := 4)($y := 3)\
-                            (reinsert! (+ ($x) ($y))))")))
+                            (reinsert (+ ($x) ($y))))")))
     (test "7" (run/string
                (calm1 -)
                (<< "(@ dnl ($a := (+ 4 3)))discard\n(@ eval ($a))")))
     (test "567" (run/string
                  (calm1 -)
-                 (<< "(@ dnl (display \"56\")\
+                 (<< "(@ dnl (raw-text \"56\")\
                       ($a := (+ 4 3)))discard\n\
                       (@ eval ($a))")))
     )
@@ -67,25 +67,25 @@
     (test "3" (run/string
                (calm1 -)
                (<< "(@ hide ($A := 3))\
-                    (@ if (and (= ($A) 1) (reinsert! \"1\"))\
-                          (and (= ($A) 2) (reinsert! \"2\"))\
-                          (and (= ($A) 3) (reinsert! \"3\"))\
-                          (and (= ($A) 4) (reinsert! \"4\")))")))
+                    (@ if (and (= ($A) 1) (reinsert \"1\"))\
+                          (and (= ($A) 2) (reinsert \"2\"))\
+                          (and (= ($A) 3) (reinsert \"3\"))\
+                          (and (= ($A) 4) (reinsert \"4\")))")))
     (test "2222211111=>1111122222"
           (run/string
            (calm1 -)
            (<< "(@ hide ($A := 1)($S := \"\"))\
                 (@ while (and (<= 1 ($A)) (<= ($A) 5) \
                               (begin \
-                                (reinsert! 1) \
+                                (reinsert 1) \
                                 ($S := (string-append ($S) \"1\")) \
                                 ($A := (+ ($A) 1)) #t)) \
                          (and (<= 6 ($A)) (<= ($A) 10) \
                               (begin \
-                                (reinsert! 2) \
+                                (reinsert 2) \
                                 ($S := (string-append ($S) \"2\")) \
                                 ($A := (+ ($A) 1)) #t)))=>\
-                (@ hide (reinsert! ($S)))")))
+                (@ hide (reinsert ($S)))")))
     )
   
   )

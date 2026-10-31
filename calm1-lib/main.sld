@@ -74,6 +74,11 @@
           (calm1-lib preprocessor-text)
           (calm1-lib path-list))
 
+  (cond-expand
+    (chicken (import (chicken process)
+                     (chicken io)))
+    (else))
+
   (export main)
 
   (begin
@@ -135,6 +140,27 @@
 
 ;;;---------------------------------------------------------------------
 
+    (define *supporting-pipes?*
+      (make-parameter (list #t)))
+
+    (define (has-final-vertical-bar s)
+      (let ((n (string-length s)))
+        (and (positive? n)
+             (char=? (string-ref s (- n 1)) #\|))))
+
+    (define (remove-final-vertical-bar s)
+      (unless (has-final-vertical-bar s)
+        (error "expected the string to end in a #\\| character" s))
+      (string-copy s 0 (- (string-length s) 1)))
+
+    (cond-expand
+      (chicken
+       (define (using-pipe-for-input input-command thunk)
+         (with-input-from-pipe input-command thunk)))
+      (else
+       (error "pipes are not supported for this Scheme implementation"
+              (string-append input-command "|"))))
+
     (define (find-and-open-input-file input-file)
       (let ((path (search-calm1-path-list input-file)))
         (if path
@@ -142,14 +168,18 @@
           (error "file not found" input-file))))
 
     (define (find-file-and-use-it-for-input input-file thunk)
-      (let ((port (find-and-open-input-file input-file)))
-        (dynamic-wind
-          (lambda () #f)
-          (lambda ()
-            (parameterize ((current-input-port port))
-              (thunk)))
-          (lambda ()
-            (close-input-port port)))))
+      (if (and (*supporting-pipes?*)
+               (has-final-vertical-bar input-file))
+        (using-pipe-for-input (remove-final-vertical-bar input-file)
+                              thunk)
+        (let ((port (find-and-open-input-file input-file)))
+          (dynamic-wind
+            (lambda () #f)
+            (lambda ()
+              (parameterize ((current-input-port port))
+                (thunk)))
+            (lambda ()
+              (close-input-port port))))))
 
 ;;;---------------------------------------------------------------------
 
@@ -700,6 +730,7 @@
                                    #f     ; deterministic?
                                    "-"    ; output
                                    ""     ; comment-style
+                                   #f     ; safe mode
                                    ))))
 
       ;;
@@ -765,6 +796,14 @@
                  (lambda (obj value)
                    (unless (string? value)
                      (error "expected a string" value))
+                   (setter! obj value))))
+
+      (getter> 6 get-safe-mode)
+      (setter> 6 set-safe-mode!
+               (lambda (setter!)
+                 (lambda (obj value)
+                   (unless (boolean? value)
+                     (error "expected a boolean" value))
                    (setter! obj value))))
 
       ) ;; end <seed>
@@ -886,6 +925,18 @@
              (error "unrecognized --comment-style option" arg)))))
 
        (option
+        '("safe" "safer") #f #f
+        (lambda (opt name arg seed)
+          (set-safe-mode! seed #t)
+          seed))
+
+       (option
+        '("less-safe") #f #f
+        (lambda (opt name arg seed)
+          (set-safe-mode! seed #f)
+          seed))
+
+       (option
         '("help") #f #f
         (lambda (opt name arg seed)
           (usage-handler 0)))
@@ -986,6 +1037,12 @@
         (display "                                 scheme, r6rs, r7rs\n"
                  port)
 
+        (display "      --safe,--safer           do not support " port)
+        (display "inclusion via pipes\n" port)
+
+        (display "      --less-safe              support " port)
+        (display "inclusion via pipes\n" port)
+
         (display "      --help" port)
         (display "                   display this help and exit\n"
                  port)
@@ -1057,9 +1114,11 @@ OTHER DEALINGS IN THE SOFTWARE.\n"
                  (definitions (get-definitions seed))
                  (deterministic? (get-deterministic seed))
                  (output-filename (get-output seed))
-                 (comment-style (get-comment-style seed)))
+                 (comment-style (get-comment-style seed))
+                 (safe-mode? (get-safe-mode seed)))
             (check-definitions definitions)
-            (parameterize ((*deterministic?* deterministic?))
+            (parameterize ((*deterministic?* deterministic?)
+                           (*supporting-pipes?* (not safe-mode?)))
               (case (length positionals)
                 ((0) (run-the-program comment-style
                                       definitions '("-")

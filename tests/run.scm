@@ -118,6 +118,9 @@
     (test "include"
           "7" (run/string
                (calm1) (<< "(@ include \"inclusion.txt\")")))
+    (test "include-raw from pipe" "12345\n"
+          (run/string
+           (calm1) (<< "(@ include-raw \"echo 12345|cat|\")")))
     )
 
   (test-group "define, @defn, undefine, pushdef, popdef"

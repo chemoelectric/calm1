@@ -68,7 +68,8 @@ You could use a named pipe or other means, too.
  handler can be used as the +MACRO-BODY+ for +(@ define ...)+ or +(@
  pushdef ...)+.
 
-|+(@out FORM)+
+|+(@out FORM)+  +
++(@out FORM PORT)+
 
 |Scheme to try to convert +FORM+ to a string and output it.
 

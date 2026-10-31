@@ -87,3 +87,22 @@ reinsert them all at once as a string.
  to +$z+ and +$A+ to +$Z+.
 
 |===
+
+There are a lot of things you can do that are undocumented. The code
+is meant to be hacked on and specialized for a particular project. The
+same thing was said about TeX, but calm1 is a small Scheme project.
+
+The project appears larger than it actually is, because it includes
+other reüsable source codes, including:
+
++(calm1-lib define-record-factory)+:: This is a copy of the R⁷RS
+implementation of +define-record-factory+, my version of Scheme
+records. I also have implementations for R⁶RS, +er-macro-transformer+,
+and Gambit Scheme.
+
++(calm1-lib snobol-match)+:: SNOBOL4/SPITBOL-like string processing
+for R⁷RS Scheme. The library works with UTF-32 stored as R⁶RS-style
+bytevectors.
+
++(calm1-lib snobol-char-set)+:: Character set support for +(calm1-lib
+snobol-match)+.

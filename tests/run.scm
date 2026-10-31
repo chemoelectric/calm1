@@ -24,63 +24,61 @@
         (test)
         (scsh-process))
 
-(test-group "everything"
-
-  (test-group "eval, hide, dnl"
-    (test "7" (run/string (calm1) (<< "(@ eval (+ 4 3))")))
-    (test "567" (run/string
-                 (calm1)
-                 (<< "(@ eval (begin ($x := 4) 5)\
+(test-group "eval, hide, dnl"
+  (test "7" (run/string (calm1) (<< "(@ eval (+ 4 3))")))
+  (test "567" (run/string
+               (calm1)
+               (<< "(@ eval (begin ($x := 4) 5)\
                       (begin ($y := 3) 6)(+ ($x) ($y)))")))
-    (test "7" (run/string
-               (calm1) (<< "(@ hide ($a := (+ 4 3)))(@ eval ($a))")))
-    (test "7" (run/string
-               (calm1)
-               (<< "(@ hide ($x := 4)($y := 3)\
+  (test "7" (run/string
+             (calm1) (<< "(@ hide ($a := (+ 4 3)))(@ eval ($a))")))
+  (test "7" (run/string
+             (calm1)
+             (<< "(@ hide ($x := 4)($y := 3)\
                             (@in (+ ($x) ($y))))")))
-    (test "7" (run/string
+  (test "7" (run/string
+             (calm1)
+             (<< "(@ dnl ($a := (+ 4 3)))discard\n(@ eval ($a))")))
+  (test "567" (run/string
                (calm1)
-               (<< "(@ dnl ($a := (+ 4 3)))discard\n(@ eval ($a))")))
-    (test "567" (run/string
-                 (calm1)
-                 (<< "(@ dnl (@out \"56\")\
+               (<< "(@ dnl (@out \"56\")\
                       ($a := (+ 4 3)))discard\n\
                       (@ eval ($a))")))
-    )
+  )
 
-  (test-group "when, unless"
-    (test "1234" (run/string
-                  (calm1)
-                  (<< "(@ when #t (number->string 1) \
+(test-group "when, unless"
+  (test "1234" (run/string
+                (calm1)
+                (<< "(@ when #t (number->string 1) \
                                    \"23\" \"4\")")))
-    (test "" (run/string
-              (calm1)
-              (<< "(@ when #f (number->string 1) \
+  (test "" (run/string
+            (calm1)
+            (<< "(@ when #f (number->string 1) \
                                \"23\" \"4\")")))
-    (test "1234" (run/string
-                  (calm1)
-                  (<< "(@ unless #f (number->string 1) \
+  (test "1234" (run/string
+                (calm1)
+                (<< "(@ unless #f (number->string 1) \
                                      \"23\" \"4\")")))
-    (test "" (run/string
-              (calm1)
-              (<< "(@ unless #t (number->string 1) \
+  (test "" (run/string
+            (calm1)
+            (<< "(@ unless #t (number->string 1) \
                                  \"23\" \"4\")")))
-    )
+  )
 
-  (test-group "if, while"
-    (test "if" "3"
-          (run/string
-           (calm1)
-           (<< "(@ hide ($A := 3))\
+(test-group "if, while"
+  (test "if" "3"
+        (run/string
+         (calm1)
+         (<< "(@ hide ($A := 3))\
                     (@ if (and (= ($A) 1) (@in \"1\"))\
                           (and (= ($A) 2) (@in \"2\"))\
                           (and (= ($A) 3) (@in \"3\"))\
                           (and (= ($A) 4) (@in \"4\")))")))
-    (test "reinsertion in reverse / collection in a string"
-          "2222211111=>1111122222"
-          (run/string
-           (calm1)
-           (<< "(@ hide ($A := 1)($S := \"\"))\
+  (test "reinsertion in reverse / collection in a string"
+        "2222211111=>1111122222"
+        (run/string
+         (calm1)
+         (<< "(@ hide ($A := 1)($S := \"\"))\
                 (@ while (and (<= 1 ($A)) (<= ($A) 5) \
                               (begin \
                                 (@in 1) \
@@ -92,11 +90,11 @@
                                 ($S := (string-append ($S) \"2\")) \
                                 ($A := (+ ($A) 1)) #t)))=>\
                 (@ hide (@in ($S)))")))
-    (test "diversion into a string port"
-          "1111122222"
-          (run/string
-           (calm1)
-           (<< "(@ hide ($z := 1))\
+  (test "diversion into a string port"
+        "1111122222"
+        (run/string
+         (calm1)
+         (<< "(@ hide ($z := 1))\
                 (@ hide ($f := (open-output-string)))\
                 (@ while (and (<= 1 ($z)) (<= ($z) 5) \
                               (begin \
@@ -108,51 +106,52 @@
                                 ($z := (+ ($z) 1)) #t)))\
                 (@ hide (@in (get-output-string ($f))))\
                 (@ hide (close-port ($f)))")))
-    )
+  )
 
-  (test-group "include-raw, include"
-    (let ((text (run/string
-                 (calm1) (<< "(@ include-raw \"run.scm\")")))
-          (nominal (run/string (cat run.scm))))
-      (test-assert "include-raw"(string=? text nominal)))
-    (test "include"
-          "7" (run/string
-               (calm1) (<< "(@ include \"inclusion.txt\")")))
-    (test "include-raw from pipe" "12345\n"
-          (run/string
-           (calm1) (<< "(@ include-raw \"echo 12345|cat|\")")))
-    )
+(test-group "include-raw, include"
+  (let ((text (run/string
+               (calm1) (<< "(@ include-raw \"run.scm\")")))
+        (nominal (run/string (cat run.scm))))
+    (test-assert "include-raw"(string=? text nominal)))
+  (test "include"
+        "7" (run/string
+             (calm1) (<< "(@ include \"inclusion.txt\")")))
+  (test "include-raw from pipe" "12345\n"
+        (run/string
+         (calm1) (<< "(@ include-raw \"echo 12345|cat|\")")))
+  (test "include from pipe" "3\n"
+        (run/string
+         (calm1) (<< "(@ include \"echo '(@ eval (+ 1 2))'|\")")))
+  )
 
-  (test-group "define, @defn, undefine, pushdef, popdef"
-    (test "(+ 4 3)"
-          (run/string
-           (calm1)
-           (<< "(@ define \"add-three\" \"(+ (@ 1) 3)\")\
+(test-group "define, @defn, undefine, pushdef, popdef"
+  (test "(+ 4 3)"
+        (run/string
+         (calm1)
+         (<< "(@ define \"add-three\" \"(+ (@ 1) 3)\")\
                 (@ add-three 4)")))
-    (test "i-am-called me or myself"
-          (run/string
-           (calm1)
-           (<< "(@ define \"i-am-called\" \"(@ 0) (@ 1) (@ 2) (@ 3)\")\
+  (test "i-am-called me or myself"
+        (run/string
+         (calm1)
+         (<< "(@ define \"i-am-called\" \"(@ 0) (@ 1) (@ 2) (@ 3)\")\
                 (@ i-am-called \"me\" \"or\" \"myself\")")))
-    (test "7(@ eval (+ 3 4))(@ hide (+ 3 4))(@ 0)(@ 1)(@ 2)(@ 3)"
-          (run/string
-           (calm1)
-           (<< "(@ define \"EVAL\" (@defn \"eval\"))\
+  (test "7(@ eval (+ 3 4))(@ hide (+ 3 4))(@ 0)(@ 1)(@ 2)(@ 3)"
+        (run/string
+         (calm1)
+         (<< "(@ define \"EVAL\" (@defn \"eval\"))\
                 (@ undefine \"eval\" \"hide\")\
                 (@ EVAL (+ 3 4))(@ eval (+ 3 4))(@ hide (+ 3 4))\
                 (@ 0)(@ 1)(@ 2)(@ 3)")))
-    (test "1234(@ one)(@ two)(@ three)(@ four)"
-          (run/string
-           (calm1)
-           (<< "(@ pushdef \"one\" \"1\")\
+  (test "1234(@ one)(@ two)(@ three)(@ four)"
+        (run/string
+         (calm1)
+         (<< "(@ pushdef \"one\" \"1\")\
                 (@ pushdef \"two\" \"2\")\
                 (@ pushdef \"three\" \"3\")\
                 (@ pushdef \"four\" \"4\")\
                 (@ one)(@ two)(@ three)(@ four)\
                 (@ popdef \"one\" \"two\" \"three\" \"four\")\
                 (@ one)(@ two)(@ three)(@ four)")))
-    )
-
   )
 
 (test-exit)

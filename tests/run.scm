@@ -68,14 +68,16 @@
     )
 
   (test-group "if, while"
-    (test "3" (run/string
-               (calm1)
-               (<< "(@ hide ($A := 3))\
+    (test "if" "3"
+          (run/string
+           (calm1)
+           (<< "(@ hide ($A := 3))\
                     (@ if (and (= ($A) 1) (@in \"1\"))\
                           (and (= ($A) 2) (@in \"2\"))\
                           (and (= ($A) 3) (@in \"3\"))\
                           (and (= ($A) 4) (@in \"4\")))")))
-    (test "2222211111=>1111122222"
+    (test "reinsertion in reverse / collection in a string"
+          "2222211111=>1111122222"
           (run/string
            (calm1)
            (<< "(@ hide ($A := 1)($S := \"\"))\
@@ -90,6 +92,22 @@
                                 ($S := (string-append ($S) \"2\")) \
                                 ($A := (+ ($A) 1)) #t)))=>\
                 (@ hide (@in ($S)))")))
+    (test "diversion into a string port"
+          "1111122222"
+          (run/string
+           (calm1)
+           (<< "(@ hide ($z := 1))\
+                (@ hide ($f := (open-output-string)))\
+                (@ while (and (<= 1 ($z)) (<= ($z) 5) \
+                              (begin \
+                                (@out 1 ($f))\
+                                ($z := (+ ($z) 1)) #t))\
+                         (and (<= 6 ($z)) (<= ($z) 10) \
+                              (begin \
+                                (@out 2 ($f))\
+                                ($z := (+ ($z) 1)) #t)))\
+                (@ hide (@in (get-output-string ($f))))\
+                (@ hide (close-port ($f)))")))
     )
 
   (test-group "include-raw, include"

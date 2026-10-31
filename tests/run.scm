@@ -102,7 +102,7 @@
                (calm1) (<< "(@ include \"inclusion.txt\")")))
     )
 
-  (test-group "define, @defn, undefine"
+  (test-group "define, @defn, undefine, pushdef, popdef"
     (test "(+ 4 3)"
           (run/string
            (calm1)
@@ -113,12 +113,13 @@
            (calm1)
            (<< "(@ define \"i-am-called\" \"(@ 0) (@ 1) (@ 2) (@ 3)\")\
                 (@ i-am-called \"me\" \"or\" \"myself\")")))
-    (test "7(@ eval (+ 3 4))(@ hide (+ 3 4))"
+    (test "7(@ eval (+ 3 4))(@ hide (+ 3 4))(@ 0)(@ 1)(@ 2)(@ 3)"
           (run/string
            (calm1)
            (<< "(@ define \"EVAL\" (@defn \"eval\"))\
                 (@ undefine \"eval\" \"hide\")\
-                (@ EVAL (+ 3 4))(@ eval (+ 3 4))(@ hide (+ 3 4))")))
+                (@ EVAL (+ 3 4))(@ eval (+ 3 4))(@ hide (+ 3 4))\
+                (@ 0)(@ 1)(@ 2)(@ 3)")))
     )
 
   )

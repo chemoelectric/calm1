@@ -120,6 +120,16 @@
                 (@ undefine \"eval\" \"hide\")\
                 (@ EVAL (+ 3 4))(@ eval (+ 3 4))(@ hide (+ 3 4))\
                 (@ 0)(@ 1)(@ 2)(@ 3)")))
+    (test "1234(@ one)(@ two)(@ three)(@ four)"
+          (run/string
+           (calm1)
+           (<< "(@ pushdef \"one\" \"1\")\
+                (@ pushdef \"two\" \"2\")\
+                (@ pushdef \"three\" \"3\")\
+                (@ pushdef \"four\" \"4\")\
+                (@ one)(@ two)(@ three)(@ four)\
+                (@ popdef \"one\" \"two\" \"three\" \"four\")\
+                (@ one)(@ two)(@ three)(@ four)")))
     )
 
   )

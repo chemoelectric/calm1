@@ -29,7 +29,7 @@
           make-macro-handler
           macro-handler-procedure)
 
-  (export get-macro-handler
+  (export get-macro-handler @defn
           set-macro-handler!
           push-macro-handler!
           pop-macro-handler!
@@ -75,6 +75,8 @@
 
     (define (get-macro-handler name)
       (get-macro-handler-aux (to-string name)))
+
+    (define @defn get-macro-handler)
 
     (define (set-macro-handler! name handler)
       (set-macro-handler!-aux (to-string name) handler))

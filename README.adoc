@@ -56,11 +56,25 @@ Gauche or Chibi.
 
 |Remove all definitions corresponding to the given macro names.
 
-|+(get-macro-handler MACRO-NAME)+
+|+(@defn MACRO-NAME)+
 
 |Scheme to return the macro handler for +MACRO-NAME+. This macro
  handler can be used as the +MACRO-BODY+ for +(@ define ...)+ or +(@
  pushdef ...)+.
+
+|+(@out FORM)+
+
+|Scheme to try to convert +FORM+ to a string and output it.
+
+|+(@in FORM)+
+
+|Scheme to try to convert +FORM+ to a string and prepend it to the
+ input (“reinsert it”).
+
+|+(@drop NUMBER)+
+
+|Scheme to drop +NUMBER+ code points from the front of the input. If
+ there are fewer code points remaining, the input is emptied.
 
 |++($a := (* ($a) (+ ($b) 1)))++
 
@@ -68,5 +82,3 @@ Gauche or Chibi.
  to +$z+ and +$A+ to +$Z+.
 
 |===
-
-

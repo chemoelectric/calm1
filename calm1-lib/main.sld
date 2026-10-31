@@ -75,8 +75,8 @@
           (calm1-lib path-list))
 
   (cond-expand
-    (chicken (import (chicken process)
-                     (chicken io)))
+    (chicken (import (chicken process)))
+    (gauche (import (gauche process)))
     (else))
 
   (export main)
@@ -157,6 +157,9 @@
       (chicken
        (define (using-pipe-for-input input-command thunk)
          (with-input-from-pipe input-command thunk)))
+      (gauche
+       (define (using-pipe-for-input input-command thunk)
+         (with-input-from-process input-command thunk)))
       (else
        (error "pipes are not supported for this Scheme implementation"
               (string-append input-command "|"))))
@@ -1125,7 +1128,7 @@ OTHER DEALINGS IN THE SOFTWARE.\n"
                                       output-filename))
                 (else (run-the-program comment-style
                                        definitions positionals
-                                        output-filename))))))))
+                                       output-filename))))))))
 
     ))
 

@@ -1,9 +1,9 @@
 == calm1: a macro-preprocessor to reduce your anxieties
 
 This macroprocessor runs in R⁷RS Scheme. The accompanying GNUmakefile
-is for building and installing with CHICKEN 6. The source code can
-easily be included with a project, to be run in an interpreter such as
-Gauche or Chibi.
+is for building, installing, and testing with CHICKEN 6. The source
+code can easily be included with a project, to be run in an
+interpreter such as Gauche, Chibi, or Sagittarius.
 
 [cols="2,3"]
 |===

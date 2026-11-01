@@ -44,6 +44,11 @@ You could use a named pipe or other means, too.
  version outputs the file contents verbatim. The “+include+” version
  inserts the file contents into the macroprocessing stream.
 
+If instead of a filename a +FORM+ is a string ending in a “&#x7C;”
+character, the inclusion is taken from the output of the shell command
+obtained by removing the final “&#x7C;” character. This capability is not
+present if the +--safer+ option is used.
+
 |+(@ define MACRO-NAME MACRO-BODY)+  +
 +(@ pushdef MACRO-NAME MACRO-BODY)+
 

@@ -22,7 +22,7 @@
 .DELETE_ON_ERROR:
 .DEFAULT_GOAL := default
 
-VERSION = 1.0.0
+VERSION = 1.0.1
 
 SED = sed
 CHICKEN_INSTALL = chicken-install
@@ -69,4 +69,5 @@ clean::
 	-rm -f calm1
 	-rm -f calm1.build.sh
 	-rm -f calm1.install.sh
-	-rm -f calm1-lib.*.{o,so,link,import.scm}
+	-rm -f calm1.{c,o,so}
+	-rm -f calm1-lib.*.{c,o,so,link,import.scm}

@@ -75,6 +75,8 @@
           (calm1-lib path-list))
 
   (cond-expand
+    (chibi (import (chibi process)
+                   (chibi shell)))
     (chicken (import (chicken process)))
     (gauche (import (gauche process)))
     (else))
@@ -154,6 +156,15 @@
       (string-copy s 0 (- (string-length s) 1)))
 
     (cond-expand
+      (chibi
+       (define (using-pipe-for-input input-command thunk)
+         (let* ((shell (get-environment-variable "SHELL"))
+                (shell (if shell shell "/bin/sh"))
+                (str (shell->string (,shell "-c" ,input-command))))
+           (let ((f (open-input-string str)))
+             (parameterize ((current-input-port f))
+               (thunk))
+             (close-port f)))))
       (chicken
        (define (using-pipe-for-input input-command thunk)
          (with-input-from-pipe input-command thunk)))

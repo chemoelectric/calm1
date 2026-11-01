@@ -1,3 +1,3 @@
 (repo git "git://github.com/chemoelectric/{egg-name}.git")
 (uri targz "https://codeload.github.com/chemoelectric/{egg-name}/tar.gz/v{egg-release}")
-(release "1.0.0")
+(release "1.0.1")

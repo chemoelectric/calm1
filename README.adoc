@@ -114,4 +114,4 @@ bytevectors.
 +(calm1-lib snobol-char-set)+:: Character set support for +(calm1-lib
 snobol-match)+.
 
-And there are test suites for the SNOBOL4-like libraries.
+And there are test programs for the SNOBOL4-like libraries.

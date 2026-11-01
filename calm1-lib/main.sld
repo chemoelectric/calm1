@@ -79,6 +79,8 @@
                    (chibi shell)))
     (chicken (import (chicken process)))
     (gauche (import (gauche process)))
+    (sagittarius (import (sagittarius process)
+                         (rnrs io ports)))
     (else))
 
   (export main)
@@ -171,6 +173,22 @@
       (gauche
        (define (using-pipe-for-input input-command thunk)
          (with-input-from-process input-command thunk)))
+      (sagittarius
+       (define (using-pipe-for-input input-command thunk)
+         (let* ((shell (get-environment-variable "SHELL"))
+                (shell (if shell shell "/bin/sh"))
+                (proc (make-process shell (list "-c" input-command))))
+           (dynamic-wind
+             (lambda () (process-run proc))
+             (lambda ()
+               (parameterize
+                   ((current-input-port
+                     (transcoded-port (process-output-port proc)
+                                      (native-transcoder))))
+                 (thunk)))
+             (lambda ()
+               (if (process-active? proc)
+                 (process-kill proc)))))))
       (else
        (error "pipes are not supported for this Scheme implementation"
               (string-append input-command "|"))))

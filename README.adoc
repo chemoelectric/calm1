@@ -96,8 +96,7 @@ present if the +--safer+ option is used.
 |===
 
 There are a lot of things you can do that are undocumented. The code
-is meant to be hacked on and specialized for a particular project. The
-same thing was said about TeX, but calm1 is a small Scheme project.
+is meant to be hacked on and specialized for a particular project.
 
 The project appears larger than it actually is, because it includes
 other reüsable source codes, including:

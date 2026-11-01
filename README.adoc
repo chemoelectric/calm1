@@ -96,7 +96,8 @@ present if the +--safer+ option is used.
 |===
 
 There are a lot of things you can do that are undocumented. The code
-is meant to be hacked on and specialized for a particular project.
+is meant to be easy to hack on and specialize for a particular
+project.
 
 The project appears larger than it actually is, because it includes
 other reüsable source codes, including:

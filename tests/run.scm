@@ -154,4 +154,21 @@
                 (@ one)(@ two)(@ three)(@ four)")))
   )
 
+(test-group "@outs, @ins"
+  (test "string" "\"this is a \\\"string\\\"\""
+        (run/string
+         (calm1) (<< "(@ hide (@outs \"this is a \\\"string\\\"\"))")))
+  (test "list" "(this is a \"list\")"
+        (run/string
+         (calm1) (<< "(@ hide (@outs '(this is a \"list\")))")))
+  (test "reinserted arithmetic in string" "\"this is 7\""
+        (run/string
+         (calm1) (<< "(@ hide (@ins \"this is (@ eval (+ 3 4))\"))")))
+  (test "reinserted list construction" "(1 2 3 4)"
+        (run/string
+         (calm1)
+         (<< "(@ hide (@ins '(@ eval (append (list 1 2)
+                                             (list 3 4)))))")))
+  )
+
 (test-exit)

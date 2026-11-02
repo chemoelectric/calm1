@@ -89,13 +89,26 @@ handler can be used as the {{MACRO\x2011;BODY}} for
 {{(@out\xA0;FORM\xA0;PORT)}}"
 
    "\x2767;\xA0;''Outputting text.''
-Scheme to try to convert {{FORM}} to a string and output it.")
+Scheme to try to convert {{FORM}} to a string and output the string.")
+
+  ("{{(@outs\xA0;FORM)}} <br>
+{{(@outs\xA0;FORM\xA0;PORT)}}"
+
+   "\x2767;\xA0;''Outputting an s-expression.''
+Scheme to try to convert {{FORM}} to an s-expression string and output
+the string.")
 
   ("{{(@in\xA0;FORM)}}"
 
    "\x2767;\xA0;''Reinserting text.''
-   Scheme to try to convert {{FORM}} to a string and prepend it to the
- input (“''reinsert''” it).")
+   Scheme to try to convert {{FORM}} to a string and prepend the
+string to the input (“''reinsert''” it).")
+
+  ("{{(@ins\xA0;FORM)}}"
+
+   "\x2767;\xA0;''Reinserting an s-expression.''
+   Scheme to try to convert {{FORM}} to an s-expression string and
+prepend the string to the input (“''reinsert''” it).")
 
   ("{{(@drop\xA0;NUMBER)}}"
 
@@ -120,25 +133,31 @@ in the environment in which macroprocessing is done. It is all
 available."
 
 @"The project appears larger than it actually is, because it includes
-other reüsable source codes, including:"
+other reüsable source codes. The author copies such codes from project
+to project and considers them freely hackable. Included are:"
 
 @(==== "Module: (calm1-lib define-record-factory)")
 
 @"This is a copy of the R⁷RS
 implementation of {{define-record-factory}}, the author’s version of
-Scheme records."
+Scheme records. (Elsewhere there are various versions for R⁶RS,
+{{er-macro-transformer}}, and Gambit Scheme’s version of
+{{syntax-case}}.)"
 
 @(==== "Module: (calm1-lib snobol-match)")
 
 @"SNOBOL4/SPITBOL-like string processing
 for R⁷RS Scheme. The library works with UTF-32, which is stored
-internally as R⁶RS-style bytevectors. There is included a test program
-for this library."
+internally as R⁶RS-style bytevectors. This style of bytevector is
+supported in R⁷RS-large as {{(except (scheme bytevector)
+bytevector-copy!)}} and in the CHICKEN {{r6rs-bytevectors}} egg as
+{{(r6rs bytevectors)}}. There is included a test program
+{{calm1-lib/test-snobol-match.scm}}."
 
 @(==== "Module: (calm1-lib snobol-char-set)")
 
 @"Character set support for {{(calm1-lib snobol-match)}}. There is
-included a test program for this library."
+included a test program {{calm1-lib/test-snobol-char-set.scm}}."
 
 @(=== "Repository")
 

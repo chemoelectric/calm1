@@ -80,12 +80,23 @@ present if the +--safer+ option is used.
 |+(@out FORM)+  +
 +(@out FORM PORT)+
 
-|Scheme to try to convert +FORM+ to a string and output it.
+|Scheme to try to convert +FORM+ to a string and output the string.
+
+|+(@outs FORM)+  +
++(@outs FORM PORT)+
+
+|Scheme to try to convert +FORM+ to an s-expression string and output
+ the string.
 
 |+(@in FORM)+
 
-|Scheme to try to convert +FORM+ to a string and prepend it to the
- input (“reinsert it”).
+|Scheme to try to convert +FORM+ to a string and prepend the string to
+ the input (“reinsert it”).
+
+|+(@ins FORM)+
+
+|Scheme to try to convert +FORM+ to an s-expression string and prepend
+ the string to the input (“reinsert it”).
 
 |+(@drop NUMBER)+
 

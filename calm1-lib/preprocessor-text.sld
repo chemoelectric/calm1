@@ -38,7 +38,9 @@
           set-preprocessor-text!
           @drop
           @in
+          @ins
           @out
+          @outs
           preprocessor-serialize
           preprocessor-stringize
           preprocessor-read-to-string
@@ -74,6 +76,15 @@
       (set-preprocessor-text!
        (utf32-string-append (preprocessor-stringize str)
                             (preprocessor-text))))
+
+    (define (@ins obj)
+      (let ((f (open-output-string)))
+        (write obj f)
+        (set-preprocessor-text!
+         (utf32-string-append (preprocessor-stringize
+                               (get-output-string f))
+                              (preprocessor-text)))
+        (close-port f)))
 
 ;;;---------------------------------------------------------------------
 
@@ -124,6 +135,16 @@
           port))))
 
     (define @out preprocessor-display-as-string)
+
+    (define @outs
+      (case-lambda
+        ((obj)
+         (@outs obj (current-output-port)))
+        ((obj port)
+         (let ((f (open-output-string)))
+           (write obj f)
+           (@out (get-output-string f) port)
+           (close-port f)))))
 
 ;;;---------------------------------------------------------------------
 

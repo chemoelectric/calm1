@@ -1,0 +1,155 @@
+@(=== "Introduction")
+
+@"This macroprocessor runs in R⁷RS Scheme. The accompanying {{calm1.egg}}
+and {{GNUmakefile}} files are for compiling, installing, and testing
+with CHICKEN 6. The source code can easily be included with any kind
+of project, to be compiled with CHICKEN or run in an interpreter such
+as Gauche, Chibi, or Sagittarius."
+
+@"Frequent use of a macroprocessor helps you worry less about errors.
+Try it and see."
+
+@(=== "Syntax")
+
+@(table
+  ("{{(@\xA0;eval\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;hide\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;dnl\xA0;FORM\xA0;...)}}"
+
+   "\x2767;\xA0;''Evaluation of'' {{FORM\xA0;...}} ''as Scheme.''
+The “{{eval}}” version
+expands the results, whereas “{{hide}}” does not. The
+“{{dnl}}” version not only hides the results, it deletes
+text up through the next newline.")
+
+  ("{{(@\xA0;when\xA0;PREDICATE\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;unless\xA0;PREDICATE\xA0;FORM\xA0;...)}}"
+
+   "\x2767;\xA0;''Deterministic branching.''
+For “{{when}}”, re-insert the evaluated results of {{FORM\xA0;...}}
+if {{PREDICATE}} evaluates as true in Scheme. For “{{unless}}”,
+reverse the sense of the {{PREDICATE}}.")
+
+  ("{{(@\xA0;if\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;while\xA0;FORM\xA0;...)}}"
+
+   "\x2767;\xA0;''Nondeterministic branching and looping.''
+These do not reinsert anything automatically, because it would be
+difficult to control reinsertion (especially by “{{while}}”) if they
+did. Incidentally, you can make the branching and looping
+deterministic by putting the all the logic in Scheme code within a
+single macro-branch. <br>\x2060;\x2000;If you want the output of
+{{(@\xA0;while\xA0;...)}} expanded recursively, you must use {{@in}}
+to reinsert iteratively generated parts ''in reverse''. Alternatively,
+you can collect the parts into a Scheme structure (such as a string or
+string port) and reinsert them all at once as a string. You could use
+a named pipe or other means, too.")
+
+  ("{{(@\xA0;include-raw\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;include\xA0;FORM\xA0;...)}}"
+
+   "\x2767;\xA0;''Inclusion of file contents or command output.''
+Include the files specified by {{FORM\xA0;...}}. The “{{include-raw}}”
+version outputs the file contents verbatim. The “{{include}}” version
+inserts the file contents into the macroprocessing stream.
+<br>\x2060;\x2000;If instead of a filename a {{FORM}} is a string ending in a “{{|}}”
+character, the inclusion is taken from the output of the shell command
+obtained by removing the final “{{|}}” character. This capability is not
+present if the {{--safer}} option is used.")
+
+  ("{{(@\xA0;define\xA0;MACRO\x2011;NAME\xA0;MACRO\x2011;BODY)}} <br>
+{{(@\xA0;pushdef\xA0;MACRO\x2011;NAME\xA0;MACRO\x2011;BODY)}}"
+
+   "\x2767;\xA0;''Macro definition.''
+Define a macro with the name given by the form {{MACRO\x2011;NAME}} and
+ definition by the form {{MACRO\x2011;BODY}}, which (in the current
+implementation) must evaluate to a string. When a macro call is made,
+{{MACRO\x2011;BODY}} is inserted and then evaluated recursively. The
+“{{define}}” version pops any top definition of the macro, whereas
+“{{pushdef}}” does not.")
+
+  ("{{(@\xA0;popdef\xA0;MACRO\x2011;NAME\xA0;...)}}"
+
+   "\x2767;\xA0;''Macro definition pop.''
+Remove the most recent macro definition for each given name.")
+
+  ("{{(@\xA0;undefine\xA0;MACRO\x2011;NAME\xA0;...)}}"
+
+   "\x2767;\xA0;''Macro definition removal.''
+Remove all macro definitions corresponding to the given macro names.")
+
+  ("{{(@defn\xA0;MACRO\x2011;NAME)}}"
+
+   "\x2767;\xA0;''Macro definition retrieval.''
+Scheme to return the macro handler for {{MACRO\x2011;NAME}}. This macro
+handler can be used as the {{MACRO\x2011;BODY}} for
+{{(@\xA0;define\xA0;...)}} or {{(@\xA0;pushdef\xA0;...)}}.")
+
+  ("{{(@out\xA0;FORM)}} <br>
+{{(@out\xA0;FORM\xA0;PORT)}}"
+
+   "\x2767;\xA0;''Outputting text.''
+Scheme to try to convert {{FORM}} to a string and output it.")
+
+  ("{{(@in\xA0;FORM)}}"
+
+   "\x2767;\xA0;''Reinserting text.''
+   Scheme to try to convert {{FORM}} to a string and prepend it to the
+ input (“''reinsert''” it).")
+
+  ("{{(@drop\xA0;NUMBER)}}"
+
+   "\x2767;\xA0;''Skipping some of the input.''
+Scheme to drop {{NUMBER}} code points from the front of the input. If
+there are fewer code points remaining, the input is emptied.")
+
+  ("{{($a\xA0;:=\xA0;(*\xA0;($a)\xA0;(+\xA0;($b)\xA0;1)))}}"
+
+   "\x2767;\xA0;''Imperative variables for use in Scheme.''
+The predefined variables are {{$a}} to\xA0;{{$z}} and {{$A}}
+to\xA0;{{$Z}}")
+
+  )
+
+@(=== "Miscellaneous")
+
+@"The code is meant to be easy to hack on and specialize for a particular
+project. There are already a lot of things you can do that are
+undocumented above. For instance, a great amount of Scheme is included
+in the environment in which macroprocessing is done. It is all
+available."
+
+@"The project appears larger than it actually is, because it includes
+other reüsable source codes, including:"
+
+@(==== "Module: (calm1-lib define-record-factory)")
+
+@"This is a copy of the R⁷RS
+implementation of {{define-record-factory}}, the author’s version of
+Scheme records."
+
+@(==== "Module: (calm1-lib snobol-match)")
+
+@"SNOBOL4/SPITBOL-like string processing
+for R⁷RS Scheme. The library works with UTF-32, which is stored
+internally as R⁶RS-style bytevectors. There is included a test program
+for this library."
+
+@(==== "Module: (calm1-lib snobol-char-set)")
+
+@"Character set support for {{(calm1-lib snobol-match)}}. There is
+included a test program for this library."
+
+@(=== "Repository")
+
+@"This egg is hosted on GitHub:"
+
+@"[[https://github.com/chemoelectric/calm1|https://github.com/chemoelectric/calm1]]"
+
+* 1.0.1 Fill in some CHICKEN egg features.
+* 1.0.0 Initial release.
+
+;;; local variables:
+;;; mode: scheme
+;;; coding: utf-8
+;;; end:

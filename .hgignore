@@ -1,7 +1,7 @@
 .*~$
 .*\.orig$
 
-^README.html$
+^README\.html$
 
 ^calm1$
 ^calm1\.(build|install)\.sh$

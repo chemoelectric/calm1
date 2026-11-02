@@ -27,7 +27,7 @@
   (import (scheme base))
   (export version)
   (begin
-    (define version "@VERSION@")
+    (define version "(@ VERSION)")
     ))
 
 ;;; local variables:

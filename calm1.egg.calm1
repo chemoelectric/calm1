@@ -1,6 +1,6 @@
 ((author "Barry Schwartz")
  (synopsis "calm1: a macro-preprocessor whose goal is to reduce your anxieties")
- (version "@VERSION@")
+ (version "(@ VERSION)")
  (license "MIT")
  (category code-generation)
  (dependencies (chicken "6.0.0")

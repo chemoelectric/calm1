@@ -22,9 +22,11 @@
 .DELETE_ON_ERROR:
 .DEFAULT_GOAL := default
 
-VERSION = 1.0.1
+VERSION = 1.0.2
 
-SED = sed
+CALM1 = calm1
+CALM1_R7RS = $(CALM1) --comment-style=r7rs
+CALM1_FLAGS = -D'VERSION=$(VERSION)'
 CHICKEN_INSTALL = chicken-install
 CHICKEN_UNINSTALL = chicken-uninstall
 
@@ -33,9 +35,10 @@ default: all
 
 all:: calm1
 
-%: %.in
-	$(SED) -e 's/@VERSION@/$(VERSION)/g' < $(<) > $(@).tmp
-	mv $(@){.tmp,}
+%.egg: %.egg.calm1
+	$(CALM1_R7RS) $(CALM1_FLAGS) $(<) -o $(@)
+%.sld: %.sld.calm1
+	$(CALM1_R7RS) $(CALM1_FLAGS) $(<) -o $(@)
 veryclean:: ; -rm -f calm1.egg calm1-lib/version.sld
 
 calm1: calm1.egg \

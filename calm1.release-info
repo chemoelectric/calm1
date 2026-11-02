@@ -1,3 +1,4 @@
 (repo git "git://github.com/chemoelectric/{egg-name}.git")
 (uri targz "https://codeload.github.com/chemoelectric/{egg-name}/tar.gz/v{egg-release}")
-(release "1.0.1")
+(release "1.0.2") ; Begin using chalk for CHICKEN documentation.
+(release "1.0.1") ; Fill in some missing parts of the CHICKEN egg.

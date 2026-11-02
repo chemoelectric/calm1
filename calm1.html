@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CHICKEN Scheme</title>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<link rel="stylesheet" href="//wiki.call-cc.org/chicken.css" type="text/css" />
+<link rel="icon" href="//call-cc.org/favicon.ico" type="image/x-icon" /></head>
+<div id="content"><a href="#calm1">
+<h2 id="calm1">calm1</h2></a>
+<p>calm1: a macro-preprocessor whose goal is to reduce your anxieties</p>
+<div id="toc">
+<ol>
+<li><a href="#calm1">calm1</a>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#syntax">Syntax</a></li>
+<li><a href="#miscellaneous">Miscellaneous</a>
+<ol>
+<li><a href="#module-calm1-lib-define-record-factory">Module: (calm1-lib define-record-factory)</a></li>
+<li><a href="#module-calm1-lib-snobol-match">Module: (calm1-lib snobol-match)</a></li>
+<li><a href="#module-calm1-lib-snobol-char-set">Module: (calm1-lib snobol-char-set)</a></li></ol></li>
+<li><a href="#repository">Repository</a></li>
+<li><a href="#author">Author</a></li>
+<li><a href="#version-history">Version History</a></li>
+<li><a href="#license">License</a></li></ol></li></ol></div><a href="#introduction">
+<h3 id="introduction">Introduction</h3></a>
+<p>This macroprocessor runs in R⁷RS Scheme. The accompanying <tt>calm1.egg</tt> and <tt>GNUmakefile</tt> files are for compiling, installing, and testing with CHICKEN 6. The source code can easily be included with any kind of project, to be compiled with CHICKEN or run in an interpreter such as Gauche, Chibi, or Sagittarius.</p>
+<p>Frequent use of a macroprocessor helps you worry less about errors. Try it and see.</p><a href="#syntax">
+<h3 id="syntax">Syntax</h3></a>
+<table>
+<tr>
+<td><tt>(@ eval FORM ...)</tt> 
+<br />
+<tt>(@ hide FORM ...)</tt> 
+<br />
+<tt>(@ dnl FORM ...)</tt></td>
+<td>❧ <i>Evaluation of</i>
+<tt>FORM ...</tt> <i>as Scheme.</i>
+The “<tt>eval</tt>” version
+expands the results, whereas “<tt>hide</tt>” does not. The
+“<tt>dnl</tt>” version not only hides the results, it deletes
+text up through the next newline.</td></tr>
+
+<tr>
+<td><tt>(@ when PREDICATE FORM ...)</tt> 
+<br />
+<tt>(@ unless PREDICATE FORM ...)</tt></td>
+<td>❧ <i>Deterministic branching.</i>
+For “<tt>when</tt>”, reïnsert the evaluated results of
+<tt>FORM ...</tt>
+if <tt>PREDICATE</tt> evaluates as true in Scheme.
+For “<tt>unless</tt>”,
+reverse the sense of the <tt>PREDICATE</tt>.</td></tr>
+
+<tr>
+<td><tt>(@ if FORM ...)</tt> 
+<br />
+<tt>(@ while FORM ...)</tt></td>
+<td>❧ <i>Nondeterministic branching and looping.</i>
+The author favors Edsger W. Dijkstra’s nondeterministic branching and
+looping. Nondeterminism is by default enforced with a
+well seeded random number
+generator, to help you catch your errors. The “<tt>if</tt>”
+and “<tt>while</tt>” macros do not reïnsert
+anything automatically, primarily because otherwise it would
+be very difficult to control reïnsertion by “<tt>while</tt>”.
+
+<br />⁠ If you want the output of <tt>(@ while ...)</tt>
+expanded recursively, you must use <tt>@in</tt> to
+reïnsert iteratively generated parts <i>in reverse</i>. Alternatively,
+you can collect the parts into a Scheme structure (such as a string or
+string port) and reïnsert them all at once as a string. You could use
+a named pipe or other means, too.
+
+<br />⁠ You can make the branching and looping deterministic
+by writing only one <tt>FORM</tt> and putting all the branching logic in
+Scheme.</td></tr>
+
+<tr>
+<td><tt>(@ include-raw FORM ...)</tt> 
+<br />
+<tt>(@ include FORM ...)</tt></td>
+<td>❧ <i>Inclusion of file contents or command output.</i>
+Include the files specified by <tt>FORM ...</tt>. The “<tt>include-raw</tt>”
+version outputs the file contents verbatim. The “<tt>include</tt>” version
+inserts the file contents into the macroprocessing stream.
+
+<br />⁠ If instead of a filename a <tt>FORM</tt>
+ is a string ending in a “<tt>|</tt>”
+character, the inclusion is taken from the output of the shell command
+obtained by removing the final “<tt>|</tt>” character.
+This capability is not
+present if the <tt>--safer</tt> option is used.</td></tr>
+
+<tr>
+<td><tt>(@ define MACRO‑NAME MACRO‑BODY)</tt> 
+<br />
+<tt>(@ pushdef MACRO‑NAME MACRO‑BODY)</tt></td>
+<td>❧ <i>Macro definition.</i>
+Define a macro with the name given by the form <tt>MACRO‑NAME</tt> and
+ definition by the form <tt>MACRO‑BODY</tt>, which (in the current
+implementation) must evaluate to a string. When a macro call is made,
+<tt>MACRO‑BODY</tt> is inserted and then evaluated recursively. The
+“<tt>define</tt>” version pops any top definition of the macro, whereas
+“<tt>pushdef</tt>” does not.</td></tr>
+
+<tr>
+<td><tt>(@ popdef MACRO‑NAME ...)</tt></td>
+<td>❧ <i>Macro definition pop.</i>
+Remove the most recent macro definition for each given name.</td></tr>
+
+<tr>
+<td><tt>(@ undefine MACRO‑NAME ...)</tt></td>
+<td>❧ <i>Macro definition removal.</i>
+Remove all macro definitions corresponding to the given macro names.</td></tr>
+
+<tr>
+<td><tt>(@defn MACRO‑NAME)</tt></td>
+<td>❧ <i>Macro definition retrieval.</i>
+Scheme to return the macro handler for <tt>MACRO‑NAME</tt>. This macro
+handler can be used as the <tt>MACRO‑BODY</tt> for
+<tt>(@ define ...)</tt> or
+<tt>(@ pushdef ...)</tt>.</td></tr>
+
+<tr>
+<td><tt>(@out FORM)</tt> 
+<br />
+<tt>(@out FORM PORT)</tt></td>
+<td>❧ <i>Outputting text.</i>
+Scheme to try to convert <tt>FORM</tt> to a string and output the string.</td></tr>
+
+<tr>
+<td><tt>(@outs FORM)</tt> 
+<br />
+<tt>(@outs FORM PORT)</tt></td>
+<td>❧ <i>Outputting an s-expression.</i>
+Scheme to try to convert <tt>FORM</tt> to an s-expression string and output
+the string.</td></tr>
+
+<tr>
+<td><tt>(@in FORM)</tt></td>
+<td>❧ <i>Reïnserting text.</i>
+   Scheme to try to convert <tt>FORM</tt> to a string and prepend the
+string to the input (“<i>reïnsert</i>” it).</td></tr>
+
+<tr>
+<td><tt>(@ins FORM)</tt></td>
+<td>❧ <i>Reïnserting an s-expression.</i>
+   Scheme to try to convert <tt>FORM</tt> to an s-expression string and
+prepend the string to the input (“<i>reïnsert</i>” it).</td></tr>
+
+<tr>
+<td><tt>(@drop NUMBER)</tt></td>
+<td>❧ <i>Skipping some of the input.</i>
+Scheme to drop <tt>NUMBER</tt> code points from the front of the input. If
+there are fewer code points remaining, the input is emptied.</td></tr>
+
+<tr>
+<td><tt>($a := (* ($a) (+ ($b) 1)))</tt></td>
+<td>❧ <i>Imperative variables for use in Scheme.</i>
+The predefined variables are <tt>$a</tt> to <tt>$z</tt> and
+<tt>$A</tt> to <tt>$Z</tt>.</td></tr></table><a href="#miscellaneous">
+<h3 id="miscellaneous">Miscellaneous</h3></a>
+<p>The code is meant to be easy to hack on and specialize for a particular project. There are already a lot of things you can do that are undocumented above. For instance, a great amount of Scheme is included in the environment in which macroprocessing is done. It is all available.</p>
+<p>The project appears larger than it actually is, because it includes other reüsable source codes. The author copies such codes from project to project and considers them freely hackable. Included are:</p><a href="#module-calm1-lib-define-record-factory">
+<h4 id="module-calm1-lib-define-record-factory">Module: (calm1-lib define-record-factory)</h4></a>
+<p>This is a copy of the R⁷RS implementation of <tt>define-record-factory</tt>, the author’s version of Scheme records. (Elsewhere there are various versions for R⁶RS, <tt>er-macro-transformer</tt>, and Gambit Scheme’s version of <tt>syntax-case</tt>.)</p><a href="#module-calm1-lib-snobol-match">
+<h4 id="module-calm1-lib-snobol-match">Module: (calm1-lib snobol-match)</h4></a>
+<p>SNOBOL4/SPITBOL-like string processing for R⁷RS Scheme. The library works with UTF-32, which is stored internally as R⁶RS-style bytevectors. This style of bytevector is supported in R⁷RS-large as <tt>(except (scheme bytevector) bytevector-copy!)</tt> and in the CHICKEN <tt>r6rs-bytevectors</tt> egg as <tt>(r6rs bytevectors)</tt>. There is included a test program <tt>calm1-lib/test-snobol-match.scm</tt>.</p><a href="#module-calm1-lib-snobol-char-set">
+<h4 id="module-calm1-lib-snobol-char-set">Module: (calm1-lib snobol-char-set)</h4></a>
+<p>Character set support for <tt>(calm1-lib snobol-match)</tt>. There is included a test program <tt>calm1-lib/test-snobol-char-set.scm</tt>.</p><a href="#repository">
+<h3 id="repository">Repository</h3></a>
+<p>This egg is hosted on GitHub:</p>
+<p><a href="https://github.com/chemoelectric/calm1" class="external">https://github.com/chemoelectric/calm1</a></p><a href="#author">
+<h3 id="author">Author</h3></a>
+<p>Barry Schwartz</p><a href="#version-history">
+<h3 id="version-history">Version History</h3></a>
+<dl>
+<dt>1.0.2</dt>
+<dd>Begin using chalk for CHICKEN documentation.</dd>
+<dt>1.0.1</dt>
+<dd>Fill in some missing parts of the CHICKEN egg.</dd></dl><a href="#license">
+<h3 id="license">License</h3></a>
+<p>MIT</p>
+<pre><tt>Copyright © 2026 Barry Schwartz 
+ 
+Permission is hereby granted, free of charge, to any person obtaining 
+a copy of this software and associated documentation files (the 
+&quot;Software&quot;), to deal in the Software without restriction, including 
+without limitation the rights to use, copy, modify, merge, publish, 
+distribute, sublicense, and/or sell copies of the Software, and to 
+permit persons to whom the Software is furnished to do so, subject to 
+the following conditions: The above copyright notice and this 
+permission notice shall be included in all copies or substantial 
+portions of the Software. 
+ 
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. </tt></pre></div></html>

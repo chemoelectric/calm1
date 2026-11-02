@@ -1,0 +1,187 @@
+(@ include "chalk.calm1")(@ dnl)
+(@ SECTION "Introduction")
+
+@"This macroprocessor runs in R⁷RS Scheme. The accompanying (@ FILE "calm1.egg")
+and (@ FILE "GNUmakefile") files are for compiling, installing, and testing
+with CHICKEN 6. The source code can easily be included with any kind
+of project, to be compiled with CHICKEN or run in an interpreter such
+as Gauche, Chibi, or Sagittarius."
+
+@"Frequent use of a macroprocessor helps you worry less about errors.
+Try it and see."
+
+(@ SECTION "Syntax")
+
+@(table
+  ("(@ CODE "(@(@ NBSP)eval(@ NBSP)FORM(@ NBSP)...)") (@ BR)
+(@ CODE "(@(@ NBSP)hide(@ NBSP)FORM(@ NBSP)...)") (@ BR)
+(@ CODE "(@(@ NBSP)dnl(@ NBSP)FORM(@ NBSP)...)")"
+
+"(@ TABLEBULLET)(@ ITAL "Evaluation of")
+(@ CODE "FORM(@ NBSP)...") (@ ITAL "as Scheme.")
+The “(@ CODE "eval")” version
+expands the results, whereas “(@ CODE "hide")” does not. The
+“(@ CODE "dnl")” version not only hides the results, it deletes
+text up through the next newline.")
+
+  ("(@ CODE "(@(@ NBSP)when(@ NBSP)PREDICATE(@ NBSP)FORM(@ NBSP)...)") (@ BR)
+(@ CODE "(@(@ NBSP)unless(@ NBSP)PREDICATE(@ NBSP)FORM(@ NBSP)...)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Deterministic branching.")
+For “(@ CODE "when")”, reïnsert the evaluated results of
+(@ CODE "FORM(@ NBSP)...")
+if (@ CODE "PREDICATE") evaluates as true in Scheme.
+For “(@ CODE "unless")”,
+reverse the sense of the (@ CODE "PREDICATE").")
+
+  ("(@ CODE "(@(@ NBSP)if(@ NBSP)FORM(@ NBSP)...)") (@ BR)
+(@ CODE "(@(@ NBSP)while(@ NBSP)FORM(@ NBSP)...)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Nondeterministic branching and looping.")
+The author favors Edsger W. Dijkstra’s nondeterministic branching and
+looping. Nondeterminism is by default enforced with a
+well seeded random number
+generator, to help you catch your errors. The “(@ CODE "if")”
+and “(@ CODE "while")” macros do not reïnsert
+anything automatically, primarily because otherwise it would
+be very difficult to control reïnsertion by “(@ CODE "while")”.
+(@ NEWGRAF)If you want the output of (@ CODE "(@(@ NBSP)while(@ NBSP)...)")
+expanded recursively, you must use (@ CODE "@in") to
+reïnsert iteratively generated parts (@ ITAL "in reverse"). Alternatively,
+you can collect the parts into a Scheme structure (such as a string or
+string port) and reïnsert them all at once as a string. You could use
+a named pipe or other means, too.
+(@ NEWGRAF)You can make the branching and looping deterministic
+by writing only one (@ CODE "FORM") and putting all the branching logic in
+Scheme.")
+
+  ("(@ CODE "(@(@ NBSP)include-raw(@ NBSP)FORM(@ NBSP)...)") (@ BR)
+(@ CODE "(@(@ NBSP)include(@ NBSP)FORM(@ NBSP)...)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Inclusion of file contents or command output.")
+Include the files specified by (@ CODE "FORM(@ NBSP)..."). The “(@ CODE "include-raw")”
+version outputs the file contents verbatim. The “(@ CODE "include")” version
+inserts the file contents into the macroprocessing stream.
+(@ NEWGRAF)If instead of a filename a (@ CODE "FORM")
+ is a string ending in a “(@ CODE "(@ VERT)")”
+character, the inclusion is taken from the output of the shell command
+obtained by removing the final “(@ CODE "(@ VERT)")” character.
+This capability is not
+present if the (@ CODE "--safer") option is used.")
+
+  ("(@ CODE "(@(@ NBSP)define(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)MACRO(@ NBH)BODY)") (@ BR)
+(@ CODE "(@(@ NBSP)pushdef(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)MACRO(@ NBH)BODY)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Macro definition.")
+Define a macro with the name given by the form (@ CODE "MACRO(@ NBH)NAME") and
+ definition by the form (@ CODE "MACRO(@ NBH)BODY"), which (in the current
+implementation) must evaluate to a string. When a macro call is made,
+(@ CODE "MACRO(@ NBH)BODY") is inserted and then evaluated recursively. The
+“(@ CODE "define")” version pops any top definition of the macro, whereas
+“(@ CODE "pushdef")” does not.")
+
+  ("(@ CODE "(@(@ NBSP)popdef(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)...)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Macro definition pop.")
+Remove the most recent macro definition for each given name.")
+
+  ("(@ CODE "(@(@ NBSP)undefine(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)...)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Macro definition removal.")
+Remove all macro definitions corresponding to the given macro names.")
+
+  ("(@ CODE "(@defn(@ NBSP)MACRO(@ NBH)NAME)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Macro definition retrieval.")
+Scheme to return the macro handler for (@ CODE "MACRO(@ NBH)NAME"). This macro
+handler can be used as the (@ CODE "MACRO(@ NBH)BODY") for
+(@ CODE "(@(@ NBSP)define(@ NBSP)...)") or
+(@ CODE "(@(@ NBSP)pushdef(@ NBSP)...)").")
+
+  ("(@ CODE "(@out(@ NBSP)FORM)") (@ BR)
+(@ CODE "(@out(@ NBSP)FORM(@ NBSP)PORT)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Outputting text.")
+Scheme to try to convert (@ CODE "FORM") to a string and output the string.")
+
+  ("(@ CODE "(@outs(@ NBSP)FORM)") (@ BR)
+(@ CODE "(@outs(@ NBSP)FORM(@ NBSP)PORT)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Outputting an s-expression.")
+Scheme to try to convert (@ CODE "FORM") to an s-expression string and output
+the string.")
+
+  ("(@ CODE "(@in(@ NBSP)FORM)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Reïnserting text.")
+   Scheme to try to convert (@ CODE "FORM") to a string and prepend the
+string to the input (“(@ ITAL "reïnsert")” it).")
+
+  ("(@ CODE "(@ins(@ NBSP)FORM)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Reïnserting an s-expression.")
+   Scheme to try to convert (@ CODE "FORM") to an s-expression string and
+prepend the string to the input (“(@ ITAL "reïnsert")” it).")
+
+  ("(@ CODE "(@drop(@ NBSP)NUMBER)")"
+
+   "(@ TABLEBULLET)(@ ITAL "Skipping some of the input.")
+Scheme to drop (@ CODE "NUMBER") code points from the front of the input. If
+there are fewer code points remaining, the input is emptied.")
+
+  ("(@ CODE "($a(@ NBSP):=(@ NBSP)(*(@ NBSP)($a)(@ NBSP)(+(@ NBSP)($b)(@ NBSP)1)))")"
+
+   "(@ TABLEBULLET)(@ ITAL "Imperative variables for use in Scheme.")
+The predefined variables are (@ CODE "$a") to(@ NBSP)(@ CODE "$z") and
+(@ CODE "$A") to(@ NBSP)(@ CODE "$Z").")
+
+  )
+
+(@ SECTION "Miscellaneous")
+
+@"The code is meant to be easy to hack on and specialize for a particular
+project. There are already a lot of things you can do that are
+undocumented above. For instance, a great amount of Scheme is included
+in the environment in which macroprocessing is done. It is all
+available."
+
+@"The project appears larger than it actually is, because it includes
+other reüsable source codes. The author copies such codes from project
+to project and considers them freely hackable. Included are:"
+
+(@ SUBSECTION "Module: (calm1-lib define-record-factory)")
+
+@"This is a copy of the R⁷RS
+implementation of (@ CODE "define-record-factory"),
+the author’s version of
+Scheme records. (Elsewhere there are various versions for R⁶RS,
+(@ CODE "er-macro-transformer"), and Gambit Scheme’s version of
+(@ CODE "syntax-case").)"
+
+(@ SUBSECTION "Module: (calm1-lib snobol-match)")
+
+@"SNOBOL4/SPITBOL-like string processing
+for R⁷RS Scheme. The library works with UTF-32, which is stored
+internally as R⁶RS-style bytevectors. This style of bytevector is
+supported in R⁷RS-large as
+(@ CODE "(except (scheme bytevector) bytevector-copy!)")
+and in the CHICKEN (@ FILE "r6rs-bytevectors")
+egg as
+(@ CODE "(r6rs bytevectors)"). There is included a test program
+(@ FILE "calm1-lib/test-snobol-match.scm")."
+
+(@ SUBSECTION "Module: (calm1-lib snobol-char-set)")
+
+@"Character set support for (@ CODE "(calm1-lib snobol-match)"). There is
+included a test program (@ FILE "calm1-lib/test-snobol-char-set.scm")."
+
+(@ SECTION "Repository")
+
+@"This egg is hosted on GitHub:"
+
+@"[[https://github.com/chemoelectric/calm1|https://github.com/chemoelectric/calm1]]"
+
+;;; local variables:
+;;; mode: scheme
+;;; coding: utf-8
+;;; end:

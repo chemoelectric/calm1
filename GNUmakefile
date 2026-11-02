@@ -29,6 +29,8 @@ CALM1_R7RS = $(CALM1) --comment-style=r7rs
 CALM1_FLAGS = -D'VERSION=$(VERSION)'
 CHICKEN_INSTALL = chicken-install
 CHICKEN_UNINSTALL = chicken-uninstall
+CHALK = chalk
+SVNWIKI2HTML = svnwiki2html
 
 .PHONY: default all clean veryclean
 default: all
@@ -40,6 +42,23 @@ all:: calm1
 %.sld: %.sld.calm1
 	$(CALM1_R7RS) $(CALM1_FLAGS) $(<) -o $(@)
 veryclean:: ; -rm -f calm1.egg calm1-lib/version.sld
+
+#%.adoc: %.adoc.calm1
+#	$(CALM1) $(CALM1_FLAGS) $(<) -o $(@)
+#all:: README.adoc
+#veryclean:: ; -rm -f README.adoc
+
+%.chalk: %.chalk.calm1 chalk.calm1
+	$(CALM1) $(CALM1_FLAGS) $(<) -o $(@)
+eggref/6/%: %.chalk | eggref/6
+	$(CHALK) $(<) > $(@)
+%.html: eggref/6/%
+	$(SVNWIKI2HTML) $(<) > $(@)
+all:: calm1.chalk eggref/6/calm1 calm1.html
+veryclean:: ; -rm -f calm1.chalk eggref/6/calm1 calm1.html
+
+eggref/6: GNUmakefile
+	mkdir -p eggref/6
 
 calm1: calm1.egg \
 		calm1.scm \

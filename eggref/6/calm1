@@ -1,0 +1,177 @@
+== calm1
+
+calm1: a macro-preprocessor whose goal is to reduce your anxieties
+
+[[toc:]]
+=== Introduction
+
+This macroprocessor runs in R⁷RS Scheme. The accompanying {{calm1.egg}}
+and {{GNUmakefile}} files are for compiling, installing, and testing
+with CHICKEN 6. The source code can easily be included with any kind
+of project, to be compiled with CHICKEN or run in an interpreter such
+as Gauche, Chibi, or Sagittarius.
+
+Frequent use of a macroprocessor helps you worry less about errors.
+Try it and see.
+
+=== Syntax
+
+<table>
+<tr><td>{{(@ eval FORM ...)}} <br>
+{{(@ hide FORM ...)}} <br>
+{{(@ dnl FORM ...)}}</td><td>❧ ''Evaluation of''
+{{FORM ...}} ''as Scheme.''
+The “{{eval}}” version
+expands the results, whereas “{{hide}}” does not. The
+“{{dnl}}” version not only hides the results, it deletes
+text up through the next newline.</td></tr>
+<tr><td>{{(@ when PREDICATE FORM ...)}} <br>
+{{(@ unless PREDICATE FORM ...)}}</td><td>❧ ''Deterministic branching.''
+For “{{when}}”, reïnsert the evaluated results of
+{{FORM ...}}
+if {{PREDICATE}} evaluates as true in Scheme.
+For “{{unless}}”,
+reverse the sense of the {{PREDICATE}}.</td></tr>
+<tr><td>{{(@ if FORM ...)}} <br>
+{{(@ while FORM ...)}}</td><td>❧ ''Nondeterministic branching and looping.''
+The author favors Edsger W. Dijkstra’s nondeterministic branching and
+looping. Nondeterminism is by default enforced with a
+well seeded random number
+generator, to help you catch your errors. The “{{if}}”
+and “{{while}}” macros do not reïnsert
+anything automatically, primarily because otherwise it would
+be very difficult to control reïnsertion by “{{while}}”.
+<br>⁠ If you want the output of {{(@ while ...)}}
+expanded recursively, you must use {{@in}} to
+reïnsert iteratively generated parts ''in reverse''. Alternatively,
+you can collect the parts into a Scheme structure (such as a string or
+string port) and reïnsert them all at once as a string. You could use
+a named pipe or other means, too.
+<br>⁠ You can make the branching and looping deterministic
+by writing only one {{FORM}} and putting all the branching logic in
+Scheme.</td></tr>
+<tr><td>{{(@ include-raw FORM ...)}} <br>
+{{(@ include FORM ...)}}</td><td>❧ ''Inclusion of file contents or command output.''
+Include the files specified by {{FORM ...}}. The “{{include-raw}}”
+version outputs the file contents verbatim. The “{{include}}” version
+inserts the file contents into the macroprocessing stream.
+<br>⁠ If instead of a filename a {{FORM}}
+ is a string ending in a “{{|}}”
+character, the inclusion is taken from the output of the shell command
+obtained by removing the final “{{|}}” character.
+This capability is not
+present if the {{--safer}} option is used.</td></tr>
+<tr><td>{{(@ define MACRO‑NAME MACRO‑BODY)}} <br>
+{{(@ pushdef MACRO‑NAME MACRO‑BODY)}}</td><td>❧ ''Macro definition.''
+Define a macro with the name given by the form {{MACRO‑NAME}} and
+ definition by the form {{MACRO‑BODY}}, which (in the current
+implementation) must evaluate to a string. When a macro call is made,
+{{MACRO‑BODY}} is inserted and then evaluated recursively. The
+“{{define}}” version pops any top definition of the macro, whereas
+“{{pushdef}}” does not.</td></tr>
+<tr><td>{{(@ popdef MACRO‑NAME ...)}}</td><td>❧ ''Macro definition pop.''
+Remove the most recent macro definition for each given name.</td></tr>
+<tr><td>{{(@ undefine MACRO‑NAME ...)}}</td><td>❧ ''Macro definition removal.''
+Remove all macro definitions corresponding to the given macro names.</td></tr>
+<tr><td>{{(@defn MACRO‑NAME)}}</td><td>❧ ''Macro definition retrieval.''
+Scheme to return the macro handler for {{MACRO‑NAME}}. This macro
+handler can be used as the {{MACRO‑BODY}} for
+{{(@ define ...)}} or
+{{(@ pushdef ...)}}.</td></tr>
+<tr><td>{{(@out FORM)}} <br>
+{{(@out FORM PORT)}}</td><td>❧ ''Outputting text.''
+Scheme to try to convert {{FORM}} to a string and output the string.</td></tr>
+<tr><td>{{(@outs FORM)}} <br>
+{{(@outs FORM PORT)}}</td><td>❧ ''Outputting an s-expression.''
+Scheme to try to convert {{FORM}} to an s-expression string and output
+the string.</td></tr>
+<tr><td>{{(@in FORM)}}</td><td>❧ ''Reïnserting text.''
+   Scheme to try to convert {{FORM}} to a string and prepend the
+string to the input (“''reïnsert''” it).</td></tr>
+<tr><td>{{(@ins FORM)}}</td><td>❧ ''Reïnserting an s-expression.''
+   Scheme to try to convert {{FORM}} to an s-expression string and
+prepend the string to the input (“''reïnsert''” it).</td></tr>
+<tr><td>{{(@drop NUMBER)}}</td><td>❧ ''Skipping some of the input.''
+Scheme to drop {{NUMBER}} code points from the front of the input. If
+there are fewer code points remaining, the input is emptied.</td></tr>
+<tr><td>{{($a := (* ($a) (+ ($b) 1)))}}</td><td>❧ ''Imperative variables for use in Scheme.''
+The predefined variables are {{$a}} to {{$z}} and
+{{$A}} to {{$Z}}.</td></tr>
+</table>
+
+=== Miscellaneous
+
+The code is meant to be easy to hack on and specialize for a particular
+project. There are already a lot of things you can do that are
+undocumented above. For instance, a great amount of Scheme is included
+in the environment in which macroprocessing is done. It is all
+available.
+
+The project appears larger than it actually is, because it includes
+other reüsable source codes. The author copies such codes from project
+to project and considers them freely hackable. Included are:
+
+==== Module: (calm1-lib define-record-factory)
+
+This is a copy of the R⁷RS
+implementation of {{define-record-factory}},
+the author’s version of
+Scheme records. (Elsewhere there are various versions for R⁶RS,
+{{er-macro-transformer}}, and Gambit Scheme’s version of
+{{syntax-case}}.)
+
+==== Module: (calm1-lib snobol-match)
+
+SNOBOL4/SPITBOL-like string processing
+for R⁷RS Scheme. The library works with UTF-32, which is stored
+internally as R⁶RS-style bytevectors. This style of bytevector is
+supported in R⁷RS-large as
+{{(except (scheme bytevector) bytevector-copy!)}}
+and in the CHICKEN {{r6rs-bytevectors}}
+egg as
+{{(r6rs bytevectors)}}. There is included a test program
+{{calm1-lib/test-snobol-match.scm}}.
+
+==== Module: (calm1-lib snobol-char-set)
+
+Character set support for {{(calm1-lib snobol-match)}}. There is
+included a test program {{calm1-lib/test-snobol-char-set.scm}}.
+
+=== Repository
+
+This egg is hosted on GitHub:
+
+[[https://github.com/chemoelectric/calm1|https://github.com/chemoelectric/calm1]]
+
+=== Author
+
+Barry Schwartz
+
+=== Version History
+
+; 1.0.2 : Begin using chalk for CHICKEN documentation.
+; 1.0.1 : Fill in some missing parts of the CHICKEN egg.
+
+=== License
+
+MIT
+
+ Copyright © 2026 Barry Schwartz 
+  
+ Permission is hereby granted, free of charge, to any person obtaining 
+ a copy of this software and associated documentation files (the 
+ "Software"), to deal in the Software without restriction, including 
+ without limitation the rights to use, copy, modify, merge, publish, 
+ distribute, sublicense, and/or sell copies of the Software, and to 
+ permit persons to whom the Software is furnished to do so, subject to 
+ the following conditions: The above copyright notice and this 
+ permission notice shall be included in all copies or substantial 
+ portions of the Software. 
+  
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 

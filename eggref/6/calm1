@@ -3,6 +3,12 @@
 calm1: a macro-preprocessor whose goal is to reduce your anxieties
 
 [[toc:]]
+=== Requirements
+
+For CHICKEN 6, the following eggs are required:
+
+[[http://wiki.call-cc.org/eggref/6/srfi-1|srfi-1]], [[http://wiki.call-cc.org/eggref/6/srfi-14|srfi-14]], [[http://wiki.call-cc.org/eggref/6/srfi-37|srfi-37]], [[http://wiki.call-cc.org/eggref/6/srfi-143|srfi-143]], [[http://wiki.call-cc.org/eggref/6/r6rs-bytevectors|r6rs-bytevectors]].
+
 === Introduction
 
 This macroprocessor runs in R⁷RS Scheme.
@@ -58,9 +64,9 @@ The “{{include-raw}}”
 version outputs the file contents verbatim. The “{{include}}” version
 inserts the file contents into the macroprocessing stream.
 <br>⁠ If instead of a filename a {{FORM}}
- is a string ending in a “{{|}}”
+ is a string ending in a “|”
 character, the inclusion is taken from the output of the shell command
-obtained by removing the final “{{|}}” character.
+obtained by removing the final “|” character.
 This capability is not
 present if the {{--safer}} option is used.</td></tr>
 <tr><td>{{(@ define MACRO‑NAME MACRO‑BODY)}} <br>
@@ -90,16 +96,20 @@ to a string and output the string.</td></tr>
 Scheme to try to convert {{FORM}}
 to an s-expression string and output the string.</td></tr>
 <tr><td>{{(@in FORM)}}</td><td>❧ ''Reïnserting text.''
-   Scheme to try to convert {{FORM}} to a string and prepend the
+Scheme to try to convert {{FORM}}
+to a string and prepend the
 string to the input (“''reïnsert''” it).</td></tr>
 <tr><td>{{(@ins FORM)}}</td><td>❧ ''Reïnserting an s-expression.''
-   Scheme to try to convert {{FORM}} to an s-expression string and
-prepend the string to the input (“''reïnsert''” it).</td></tr>
+Scheme to try to convert {{FORM}}
+to an s-expression string and
+prepend the string to the input
+(“''reïnsert''” it).</td></tr>
 <tr><td>{{(@drop NUMBER)}}</td><td>❧ ''Skipping some of the input.''
 Scheme to drop {{NUMBER}} code points from the front of the input. If
 there are fewer code points remaining, the input is emptied.</td></tr>
 <tr><td>{{($a := (* ($a) (+ ($b) 1)))}}</td><td>❧ ''Imperative variables for use in Scheme.''
-The predefined variables are {{$a}} to {{$z}} and
+The predefined variables are {{$a}}
+to {{$z}} and
 {{$A}} to {{$Z}}.</td></tr>
 </table>
 
@@ -144,7 +154,7 @@ There is included a test program
 
 === Repository
 
-This egg is hosted on GitHub:
+This software is hosted on GitHub:
 
 [[https://github.com/chemoelectric/calm1|https://github.com/chemoelectric/calm1]]
 

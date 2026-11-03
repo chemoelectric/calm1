@@ -1,0 +1,20 @@
+(@ dnl)
+(@ dnl)  Macros for asciidoc documents.
+(@ dnl)
+(@ define "TITLE" "== (@ 1)")(@ dnl)
+(@ define "SECTION" "=== (@ 1)")(@ dnl)
+(@ define "SUBSECTION" "==== (@ 1)")(@ dnl)
+(@ define "FILE" "++(@ 1)++")(@ dnl)
+(@ define "CODE" "++(@ 1)++")(@ dnl)
+(@ define "ITAL" "__(@ 1)__")(@ dnl)
+(@ define "NBSP" "\xA0;")(@ dnl)                   Nonbreak space.
+(@ define "NBH" "\x2011;")(@ dnl)                  Nonbreak hyphen.
+(@ define "VERT" "&#x7C;")(@ dnl)                  Vertical bar.
+(@ define "TABLEBULLET" "\x2767;\xA0;")(@ dnl)     Fleuron.
+(@ define "NEWGRAF" "  +\n\x2060;\x2000;")(@ dnl)  En space indent.
+(@ define "BR" "  +")(@ dnl)
+(@ define "PARAGRAPH" "(@ 1)")(@ dnl)              A regular paragraph.
+(@ define "TABLERIGHT" "(@ TABLEBULLET)(@ 1)")(@ dnl)
+(@ define "SYNTAXTABLE" "[cols = \"3,4\"]\n|===\n\n(@ 1)\n\n|===")(@ dnl)
+(@ define "SYNTAXTABLEENTRY" "|(@ 1)\n\n|(@ 2)\n\n")(@ dnl)
+(@ define "LINK" "(@ 1)[(@ 2)]")(@ dnl)

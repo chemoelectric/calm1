@@ -1,0 +1,24 @@
+(@ SECTION "Requirements")
+
+(@ hide ($p := (with-input-from-file
+                 "calm1.egg"
+                 (lambda ()
+                   (reverse!
+                    (filter symbol?
+                            (cdr (assq (quote dependencies)
+                                       (read)))))))))
+(@ hide ($r := "(@ CHICKEN_WIKI)/eggref/6/"))
+(@ hide ($q := "."))
+(@ PARAGRAPH
+"For CHICKEN 6, the following eggs are required:")
+(@ PARAGRAPH
+"(@ while (and (pair? ($p))
+               ($e := (symbol->string (car ($p))))
+               ($s := (string-append \"(@ LINK \\\"\"
+                                     ($r) ($e)
+                                     \"\\\" \\\"\"
+                                     ($e) \"\\\")\" ($q)))
+               (@in ($s))
+               ($q := \", \")
+               ($p := (cdr ($p)))
+               #t))")

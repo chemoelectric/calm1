@@ -1,0 +1,156 @@
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@(@ NBSP)eval(@ NBSP)FORM(@ NBSP)...)\") (@ BR)
+(@ CODE \"(@(@ NBSP)hide(@ NBSP)FORM(@ NBSP)...)\") (@ BR)
+(@ CODE \"(@(@ NBSP)dnl(@ NBSP)FORM(@ NBSP)...)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Evaluation of\\\")
+(@ CODE \\\"FORM(@ NBSP)...\\\") (@ ITAL \\\"as Scheme.\\\")
+The “(@ CODE \\\"eval\\\")” version
+expands the results, whereas “(@ CODE \\\"hide\\\")” does not. The
+“(@ CODE \\\"dnl\\\")” version not only hides the results, it deletes
+text up through the next newline.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@(@ NBSP)when(@ NBSP)PREDICATE(@ NBSP)FORM(@ NBSP)...)\") (@ BR)
+(@ CODE \"(@(@ NBSP)unless(@ NBSP)PREDICATE(@ NBSP)FORM(@ NBSP)...)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Deterministic branching.\\\")
+For “(@ CODE \\\"when\\\")”, reïnsert the evaluated results of
+(@ CODE \\\"FORM(@ NBSP)...\\\")
+if (@ CODE \\\"PREDICATE\\\") evaluates as true in Scheme.
+For “(@ CODE \\\"unless\\\")”,
+reverse the sense of the (@ CODE \\\"PREDICATE\\\").\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@(@ NBSP)if(@ NBSP)FORM(@ NBSP)...)\") (@ BR)
+(@ CODE \"(@(@ NBSP)while(@ NBSP)FORM(@ NBSP)...)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Nondeterministic branching and looping.\\\")
+The author favors Edsger W. Dijkstra’s nondeterministic branching and
+looping. Nondeterminism is by default enforced with a
+well seeded random number
+generator, to help you catch your errors. The “(@ CODE \\\"if\\\")”
+and “(@ CODE \\\"while\\\")” macros do not reïnsert
+anything automatically, primarily because otherwise it would
+be very difficult to control reïnsertion by “(@ CODE \\\"while\\\")”.
+(@ NEWGRAF)If you want the output of (@ CODE \\\"(@(@ NBSP)while(@ NBSP)...)\\\")
+expanded recursively, you must use (@ CODE \\\"@in\\\") to
+reïnsert iteratively generated parts (@ ITAL \\\"in reverse\\\"). Alternatively,
+you can collect the parts into a Scheme structure (such as a string or
+string port) and reïnsert them all at once as a string. You could use
+a named pipe or other means, too.
+(@ NEWGRAF)You can make the branching and looping deterministic
+by writing only one (@ CODE \\\"FORM\\\") and putting all the branching logic in
+Scheme.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@(@ NBSP)include-raw(@ NBSP)FORM(@ NBSP)...)\") (@ BR)
+(@ CODE \"(@(@ NBSP)include(@ NBSP)FORM(@ NBSP)...)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Inclusion of file contents or command output.\\\")
+Include the files specified by (@ CODE \\\"FORM(@ NBSP)...\\\").
+The “(@ CODE \\\"include-raw\\\")”
+version outputs the file contents verbatim. The “(@ CODE \\\"include\\\")” version
+inserts the file contents into the macroprocessing stream.
+(@ NEWGRAF)If instead of a filename a (@ CODE \\\"FORM\\\")
+ is a string ending in a “(@ VERT)”
+character, the inclusion is taken from the output of the shell command
+obtained by removing the final “(@ VERT)” character.
+This capability is not
+present if the (@ CODE \\\"--safer\\\") option is used.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@(@ NBSP)define(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)MACRO(@ NBH)BODY)\") (@ BR)
+(@ CODE \"(@(@ NBSP)pushdef(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)MACRO(@ NBH)BODY)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Macro definition.\\\")
+Define a macro with the name given by the form (@ CODE \\\"MACRO(@ NBH)NAME\\\") and
+ definition by the form (@ CODE \\\"MACRO(@ NBH)BODY\\\"), which (in the current
+implementation) must evaluate to a string. When a macro call is made,
+(@ CODE \\\"MACRO(@ NBH)BODY\\\") is inserted and then evaluated recursively. The
+“(@ CODE \\\"define\\\")” version pops any top definition of the macro, whereas
+“(@ CODE \\\"pushdef\\\")” does not.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@(@ NBSP)popdef(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)...)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Macro definition pop.\\\")
+Remove the most recent macro definition for each given name.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@(@ NBSP)undefine(@ NBSP)MACRO(@ NBH)NAME(@ NBSP)...)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Macro definition removal.\\\")
+Remove all macro definitions corresponding to the given macro names.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@defn(@ NBSP)MACRO(@ NBH)NAME)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Macro definition retrieval.\\\")
+Scheme to return the macro handler for (@ CODE \\\"MACRO(@ NBH)NAME\\\").
+This macro
+handler can be used as the (@ CODE \\\"MACRO(@ NBH)BODY\\\") for
+(@ CODE \\\"(@(@ NBSP)define(@ NBSP)...)\\\") or
+(@ CODE \\\"(@(@ NBSP)pushdef(@ NBSP)...)\\\").\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@out(@ NBSP)FORM)\") (@ BR)
+(@ CODE \"(@out(@ NBSP)FORM(@ NBSP)PORT)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Outputting text.\\\")
+Scheme to try to convert (@ CODE \\\"FORM\\\")
+to a string and output the string.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@outs(@ NBSP)FORM)\") (@ BR)
+(@ CODE \"(@outs(@ NBSP)FORM(@ NBSP)PORT)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Outputting an s-expression.\\\")
+Scheme to try to convert (@ CODE \\\"FORM\\\")
+to an s-expression string and output the string.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@in(@ NBSP)FORM)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Reïnserting text.\\\")
+Scheme to try to convert (@ CODE \\\"FORM\\\")
+to a string and prepend the
+string to the input (“(@ ITAL \\\"reïnsert\\\")” it).\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@ins(@ NBSP)FORM)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Reïnserting an s-expression.\\\")
+Scheme to try to convert (@ CODE \\\"FORM\\\")
+to an s-expression string and
+prepend the string to the input
+(“(@ ITAL \\\"reïnsert\\\")” it).\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"(@drop(@ NBSP)NUMBER)\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Skipping some of the input.\\\")
+Scheme to drop (@ CODE \\\"NUMBER\\\") code points from the front of the input. If
+there are fewer code points remaining, the input is emptied.\")"
+)
+
+(@ SYNTAXTABLEENTRY
+"(@ CODE \"($a(@ NBSP):=(@ NBSP)(*(@ NBSP)($a)(@ NBSP)(+(@ NBSP)($b)(@ NBSP)1)))\")"
+
+"(@ TABLERIGHT \"(@ ITAL \\\"Imperative variables for use in Scheme.\\\")
+The predefined variables are (@ CODE \\\"$a\\\")
+to(@ NBSP)(@ CODE \\\"$z\\\") and
+(@ CODE \\\"$A\\\") to(@ NBSP)(@ CODE \\\"$Z\\\").\")"
+)

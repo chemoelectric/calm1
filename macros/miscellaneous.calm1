@@ -1,0 +1,41 @@
+(@ SECTION "Miscellaneous")
+
+(@ PARAGRAPH
+   "The code is meant to be easy to hack on and specialize for a particular
+project. There are already a lot of things you can do that are
+undocumented above. For instance, a great amount of Scheme is included
+in the environment in which macroprocessing is done. It is all
+available.")
+
+(@ PARAGRAPH
+   "The project appears larger than it actually is, because it includes
+other reüsable source codes. The author copies such codes from project
+to project and considers them freely hackable. Included are:")
+
+(@ SUBSECTION "Module: (calm1-lib define-record-factory)")
+
+(@ PARAGRAPH "This is a copy of the R⁷RS
+implementation of (@ CODE \"define-record-factory\"),
+the author’s version of
+Scheme records. (Elsewhere there are various versions for R⁶RS,
+(@ CODE \"er-macro-transformer\"), and Gambit Scheme’s version of
+(@ CODE \"syntax-case\").)")
+
+(@ SUBSECTION "Module: (calm1-lib snobol-match)")
+
+(@ PARAGRAPH "SNOBOL4/SPITBOL-like string processing
+for R⁷RS Scheme. The library works with UTF-32, which is stored
+internally as R⁶RS-style bytevectors. This style of bytevector is
+supported in R⁷RS-large as
+(@ CODE \"(except (scheme bytevector) bytevector-copy!)\")
+and in the CHICKEN (@ FILE \"r6rs-bytevectors\")
+egg as
+(@ CODE \"(r6rs bytevectors)\"). There is included a test program
+(@ FILE \"calm1-lib/test-snobol-match.scm\").")
+
+(@ SUBSECTION "Module: (calm1-lib snobol-char-set)")
+
+(@ PARAGRAPH
+   "Character set support for (@ CODE \"(calm1-lib snobol-match)\").
+There is included a test program
+(@ FILE \"calm1-lib/test-snobol-char-set.scm\").")

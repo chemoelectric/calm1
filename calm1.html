@@ -12,6 +12,7 @@
 <ol>
 <li><a href="#calm1">calm1</a>
 <ol>
+<li><a href="#requirements">Requirements</a></li>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#syntax">Syntax</a></li>
 <li><a href="#miscellaneous">Miscellaneous</a>
@@ -22,7 +23,10 @@
 <li><a href="#repository">Repository</a></li>
 <li><a href="#author">Author</a></li>
 <li><a href="#version-history">Version History</a></li>
-<li><a href="#license">License</a></li></ol></li></ol></div><a href="#introduction">
+<li><a href="#license">License</a></li></ol></li></ol></div><a href="#requirements">
+<h3 id="requirements">Requirements</h3></a>
+<p>For CHICKEN 6, the following eggs are required:</p>
+<p><a href="http://wiki.call-cc.org/eggref/6/srfi-1" class="external">srfi-1</a>, <a href="http://wiki.call-cc.org/eggref/6/srfi-14" class="external">srfi-14</a>, <a href="http://wiki.call-cc.org/eggref/6/srfi-37" class="external">srfi-37</a>, <a href="http://wiki.call-cc.org/eggref/6/srfi-143" class="external">srfi-143</a>, <a href="http://wiki.call-cc.org/eggref/6/r6rs-bytevectors" class="external">r6rs-bytevectors</a>.</p><a href="#introduction">
 <h3 id="introduction">Introduction</h3></a>
 <p>This macroprocessor runs in R⁷RS Scheme. The accompanying <tt>calm1.egg</tt> and <tt>GNUmakefile</tt> files are for compiling, installing, and testing with CHICKEN 6. The source code can easily be included with any kind of project, to be compiled with CHICKEN or run in an interpreter such as Gauche, Chibi, or Sagittarius.</p>
 <p>Frequent use of a macroprocessor helps you worry less about errors. Try it and see.</p><a href="#syntax">
@@ -87,9 +91,9 @@ version outputs the file contents verbatim. The “<tt>include</tt>” version
 inserts the file contents into the macroprocessing stream.
 
 <br />⁠ If instead of a filename a <tt>FORM</tt>
- is a string ending in a “<tt>|</tt>”
+ is a string ending in a “|”
 character, the inclusion is taken from the output of the shell command
-obtained by removing the final “<tt>|</tt>” character.
+obtained by removing the final “|” character.
 This capability is not
 present if the <tt>--safer</tt> option is used.</td></tr>
 
@@ -143,14 +147,17 @@ to an s-expression string and output the string.</td></tr>
 <tr>
 <td><tt>(@in FORM)</tt></td>
 <td>❧ <i>Reïnserting text.</i>
-   Scheme to try to convert <tt>FORM</tt> to a string and prepend the
+Scheme to try to convert <tt>FORM</tt>
+to a string and prepend the
 string to the input (“<i>reïnsert</i>” it).</td></tr>
 
 <tr>
 <td><tt>(@ins FORM)</tt></td>
 <td>❧ <i>Reïnserting an s-expression.</i>
-   Scheme to try to convert <tt>FORM</tt> to an s-expression string and
-prepend the string to the input (“<i>reïnsert</i>” it).</td></tr>
+Scheme to try to convert <tt>FORM</tt>
+to an s-expression string and
+prepend the string to the input
+(“<i>reïnsert</i>” it).</td></tr>
 
 <tr>
 <td><tt>(@drop NUMBER)</tt></td>
@@ -161,7 +168,8 @@ there are fewer code points remaining, the input is emptied.</td></tr>
 <tr>
 <td><tt>($a := (* ($a) (+ ($b) 1)))</tt></td>
 <td>❧ <i>Imperative variables for use in Scheme.</i>
-The predefined variables are <tt>$a</tt> to <tt>$z</tt> and
+The predefined variables are <tt>$a</tt>
+to <tt>$z</tt> and
 <tt>$A</tt> to <tt>$Z</tt>.</td></tr></table><a href="#miscellaneous">
 <h3 id="miscellaneous">Miscellaneous</h3></a>
 <p>The code is meant to be easy to hack on and specialize for a particular project. There are already a lot of things you can do that are undocumented above. For instance, a great amount of Scheme is included in the environment in which macroprocessing is done. It is all available.</p>
@@ -173,7 +181,7 @@ The predefined variables are <tt>$a</tt> to <tt>$z</tt> and
 <h4 id="module-calm1-lib-snobol-char-set">Module: (calm1-lib snobol-char-set)</h4></a>
 <p>Character set support for <tt>(calm1-lib snobol-match)</tt>. There is included a test program <tt>calm1-lib/test-snobol-char-set.scm</tt>.</p><a href="#repository">
 <h3 id="repository">Repository</h3></a>
-<p>This egg is hosted on GitHub:</p>
+<p>This software is hosted on GitHub:</p>
 <p><a href="https://github.com/chemoelectric/calm1" class="external">https://github.com/chemoelectric/calm1</a></p><a href="#author">
 <h3 id="author">Author</h3></a>
 <p>Barry Schwartz</p><a href="#version-history">

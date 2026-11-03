@@ -24,13 +24,24 @@
 
 VERSION = 1.0.2
 
+CHICKEN_WIKI = http://wiki.call-cc.org
+
 CALM1 = calm1
 CALM1_R7RS = $(CALM1) --comment-style=r7rs
-CALM1_FLAGS = -D'VERSION=$(VERSION)'
+CALM1_FLAGS = -D'VERSION=$(VERSION)' -D'CHICKEN_WIKI=$(CHICKEN_WIKI)'
 CHICKEN_INSTALL = chicken-install
 CHICKEN_UNINSTALL = chicken-uninstall
 CHALK = chalk
 SVNWIKI2HTML = svnwiki2html
+
+CALM1_DOC_SRC = \
+	$(addprefix macros/, \
+		introduction.calm1 \
+		miscellaneous.calm1 \
+		repository.calm1 \
+		requirements.calm1 \
+		syntax.calm1 \
+		syntax-table.calm1)
 
 .PHONY: default all clean veryclean
 default: all
@@ -43,14 +54,15 @@ all:: calm1
 	$(CALM1_R7RS) $(CALM1_FLAGS) $(<) -o $(@)
 veryclean:: ; -rm -f calm1.egg calm1-lib/version.sld
 
-#%.adoc: %.adoc.calm1
-#	$(CALM1) $(CALM1_FLAGS) $(<) -o $(@)
-#all:: README.adoc
-#veryclean:: ; -rm -f README.adoc
-
-%.chalk: %.chalk.calm1 chalk.calm1
+%.adoc: %.adoc.calm1 macros/adoc.calm1 $(CALM1_DOC_SRC)
 	$(CALM1) $(CALM1_FLAGS) $(<) -o $(@)
-eggref/6/%: %.chalk | eggref/6
+all:: README.adoc
+veryclean:: ; -rm -f README.adoc
+
+%.chalk: %.chalk.calm1 macros/chalk.calm1 $(CALM1_DOC_SRC)
+	$(CALM1) $(CALM1_FLAGS) $(<) -o $(@)
+eggref/6/%: %.chalk
+	mkdir -p $(@D)
 	$(CHALK) $(<) > $(@)
 %.html: eggref/6/%
 	$(SVNWIKI2HTML) $(<) > $(@)

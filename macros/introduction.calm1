@@ -1,0 +1,13 @@
+(@ SECTION "Introduction")
+
+(@ PARAGRAPH
+   "This macroprocessor runs in R⁷RS Scheme.
+The accompanying (@ FILE \"calm1.egg\")
+and (@ FILE \"GNUmakefile\") files are for compiling, installing, and testing
+with CHICKEN 6. The source code can easily be included with any kind
+of project, to be compiled with CHICKEN or run in an interpreter such
+as Gauche, Chibi, or Sagittarius.")
+
+(@ PARAGRAPH
+   "Frequent use of a macroprocessor helps you worry less about errors.
+Try it and see.")

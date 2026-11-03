@@ -1,0 +1,2 @@
+(@ SECTION "Syntax")
+(@ SYNTAXTABLE "(@ include \"macros/syntax-table.calm1\")")

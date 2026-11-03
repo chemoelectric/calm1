@@ -1,0 +1,19 @@
+(@ dnl)
+(@ dnl)  Macros for chalk documents.
+(@ dnl)
+(@ define "SECTION" "@(=== \"(@ 1)\")")(@ dnl)
+(@ define "SUBSECTION" "@(==== \"(@ 1)\")")(@ dnl)
+(@ define "FILE" "{{(@ 1)}}")(@ dnl)
+(@ define "CODE" "{{(@ 1)}}")(@ dnl)
+(@ define "ITAL" "''(@ 1)''")(@ dnl)
+(@ define "NBSP" "\xA0;")(@ dnl)                  Nonbreak space.
+(@ define "NBH" "\x2011;")(@ dnl)                 Nonbreak hyphen.
+(@ define "VERT" "|")(@ dnl)                      Vertical bar.
+(@ define "TABLEBULLET" "\x2767;\xA0;")(@ dnl)    Fleuron.
+(@ define "NEWGRAF" "<br>\x2060;\x2000;")(@ dnl)  En space indent.
+(@ define "BR" "<br>")(@ dnl)
+(@ define "PARAGRAPH" "@\"(@ 1)\"")(@ dnl)        A regular paragraph.
+(@ define "TABLERIGHT" "\"(@ TABLEBULLET)(@ 1)\"")(@ dnl)
+(@ define "SYNTAXTABLE" "@(table (@ 1))")(@ dnl)
+(@ define "SYNTAXTABLEENTRY" "(\"(@ 1)\"\n\n(@ 2))")(@ dnl)
+(@ define "LINK" "[[(@ 1)|(@ 2)]]")(@ dnl)

@@ -1,6 +1,7 @@
 @(=== "Introduction")
 
-@"This macroprocessor runs in R⁷RS Scheme. The accompanying {{calm1.egg}}
+@"This macroprocessor runs in R⁷RS Scheme.
+The accompanying {{calm1.egg}}
 and {{GNUmakefile}} files are for compiling, installing, and testing
 with CHICKEN 6. The source code can easily be included with any kind
 of project, to be compiled with CHICKEN or run in an interpreter such
@@ -12,31 +13,31 @@ Try it and see."
 @(=== "Syntax")
 
 @(table
-  ("{{(@ eval FORM ...)}} <br>
-{{(@ hide FORM ...)}} <br>
-{{(@ dnl FORM ...)}}"
+  ("{{(@\xA0;eval\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;hide\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;dnl\xA0;FORM\xA0;...)}}"
 
-"❧ ''Evaluation of''
-{{FORM ...}} ''as Scheme.''
+"\x2767;\xA0;''Evaluation of''
+{{FORM\xA0;...}} ''as Scheme.''
 The “{{eval}}” version
 expands the results, whereas “{{hide}}” does not. The
 “{{dnl}}” version not only hides the results, it deletes
 text up through the next newline.")
 
-  ("{{(@ when PREDICATE FORM ...)}} <br>
-{{(@ unless PREDICATE FORM ...)}}"
+  ("{{(@\xA0;when\xA0;PREDICATE\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;unless\xA0;PREDICATE\xA0;FORM\xA0;...)}}"
 
-   "❧ ''Deterministic branching.''
+"\x2767;\xA0;''Deterministic branching.''
 For “{{when}}”, reïnsert the evaluated results of
-{{FORM ...}}
+{{FORM\xA0;...}}
 if {{PREDICATE}} evaluates as true in Scheme.
 For “{{unless}}”,
 reverse the sense of the {{PREDICATE}}.")
 
-  ("{{(@ if FORM ...)}} <br>
-{{(@ while FORM ...)}}"
+  ("{{(@\xA0;if\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;while\xA0;FORM\xA0;...)}}"
 
-   "❧ ''Nondeterministic branching and looping.''
+"\x2767;\xA0;''Nondeterministic branching and looping.''
 The author favors Edsger W. Dijkstra’s nondeterministic branching and
 looping. Nondeterminism is by default enforced with a
 well seeded random number
@@ -44,95 +45,98 @@ generator, to help you catch your errors. The “{{if}}”
 and “{{while}}” macros do not reïnsert
 anything automatically, primarily because otherwise it would
 be very difficult to control reïnsertion by “{{while}}”.
-<br>⁠ If you want the output of {{(@ while ...)}}
+<br>\x2060;\x2000;If you want the output of {{(@\xA0;while\xA0;...)}}
 expanded recursively, you must use {{@in}} to
 reïnsert iteratively generated parts ''in reverse''. Alternatively,
 you can collect the parts into a Scheme structure (such as a string or
 string port) and reïnsert them all at once as a string. You could use
 a named pipe or other means, too.
-<br>⁠ You can make the branching and looping deterministic
+<br>\x2060;\x2000;You can make the branching and looping deterministic
 by writing only one {{FORM}} and putting all the branching logic in
 Scheme.")
 
-  ("{{(@ include-raw FORM ...)}} <br>
-{{(@ include FORM ...)}}"
+  ("{{(@\xA0;include-raw\xA0;FORM\xA0;...)}} <br>
+{{(@\xA0;include\xA0;FORM\xA0;...)}}"
 
-   "❧ ''Inclusion of file contents or command output.''
-Include the files specified by {{FORM ...}}. The “{{include-raw}}”
+   "\x2767;\xA0;''Inclusion of file contents or command output.''
+Include the files specified by {{FORM\xA0;...}}.
+The “{{include-raw}}”
 version outputs the file contents verbatim. The “{{include}}” version
 inserts the file contents into the macroprocessing stream.
-<br>⁠ If instead of a filename a {{FORM}}
+<br>\x2060;\x2000;If instead of a filename a {{FORM}}
  is a string ending in a “{{|}}”
 character, the inclusion is taken from the output of the shell command
 obtained by removing the final “{{|}}” character.
 This capability is not
 present if the {{--safer}} option is used.")
 
-  ("{{(@ define MACRO‑NAME MACRO‑BODY)}} <br>
-{{(@ pushdef MACRO‑NAME MACRO‑BODY)}}"
+  ("{{(@\xA0;define\xA0;MACRO\x2011;NAME\xA0;MACRO\x2011;BODY)}} <br>
+{{(@\xA0;pushdef\xA0;MACRO\x2011;NAME\xA0;MACRO\x2011;BODY)}}"
 
-   "❧ ''Macro definition.''
-Define a macro with the name given by the form {{MACRO‑NAME}} and
- definition by the form {{MACRO‑BODY}}, which (in the current
+   "\x2767;\xA0;''Macro definition.''
+Define a macro with the name given by the form {{MACRO\x2011;NAME}} and
+ definition by the form {{MACRO\x2011;BODY}}, which (in the current
 implementation) must evaluate to a string. When a macro call is made,
-{{MACRO‑BODY}} is inserted and then evaluated recursively. The
+{{MACRO\x2011;BODY}} is inserted and then evaluated recursively. The
 “{{define}}” version pops any top definition of the macro, whereas
 “{{pushdef}}” does not.")
 
-  ("{{(@ popdef MACRO‑NAME ...)}}"
+  ("{{(@\xA0;popdef\xA0;MACRO\x2011;NAME\xA0;...)}}"
 
-   "❧ ''Macro definition pop.''
+   "\x2767;\xA0;''Macro definition pop.''
 Remove the most recent macro definition for each given name.")
 
-  ("{{(@ undefine MACRO‑NAME ...)}}"
+  ("{{(@\xA0;undefine\xA0;MACRO\x2011;NAME\xA0;...)}}"
 
-   "❧ ''Macro definition removal.''
+   "\x2767;\xA0;''Macro definition removal.''
 Remove all macro definitions corresponding to the given macro names.")
 
-  ("{{(@defn MACRO‑NAME)}}"
+  ("{{(@defn\xA0;MACRO\x2011;NAME)}}"
 
-   "❧ ''Macro definition retrieval.''
-Scheme to return the macro handler for {{MACRO‑NAME}}. This macro
-handler can be used as the {{MACRO‑BODY}} for
-{{(@ define ...)}} or
-{{(@ pushdef ...)}}.")
+   "\x2767;\xA0;''Macro definition retrieval.''
+Scheme to return the macro handler for {{MACRO\x2011;NAME}}.
+This macro
+handler can be used as the {{MACRO\x2011;BODY}} for
+{{(@\xA0;define\xA0;...)}} or
+{{(@\xA0;pushdef\xA0;...)}}.")
 
-  ("{{(@out FORM)}} <br>
-{{(@out FORM PORT)}}"
+  ("{{(@out\xA0;FORM)}} <br>
+{{(@out\xA0;FORM\xA0;PORT)}}"
 
-   "❧ ''Outputting text.''
-Scheme to try to convert {{FORM}} to a string and output the string.")
+   "\x2767;\xA0;''Outputting text.''
+Scheme to try to convert {{FORM}}
+to a string and output the string.")
 
-  ("{{(@outs FORM)}} <br>
-{{(@outs FORM PORT)}}"
+  ("{{(@outs\xA0;FORM)}} <br>
+{{(@outs\xA0;FORM\xA0;PORT)}}"
 
-   "❧ ''Outputting an s-expression.''
-Scheme to try to convert {{FORM}} to an s-expression string and output
-the string.")
+   "\x2767;\xA0;''Outputting an s-expression.''
+Scheme to try to convert {{FORM}}
+to an s-expression string and output the string.")
 
-  ("{{(@in FORM)}}"
+  ("{{(@in\xA0;FORM)}}"
 
-   "❧ ''Reïnserting text.''
+   "\x2767;\xA0;''Reïnserting text.''
    Scheme to try to convert {{FORM}} to a string and prepend the
 string to the input (“''reïnsert''” it).")
 
-  ("{{(@ins FORM)}}"
+  ("{{(@ins\xA0;FORM)}}"
 
-   "❧ ''Reïnserting an s-expression.''
+   "\x2767;\xA0;''Reïnserting an s-expression.''
    Scheme to try to convert {{FORM}} to an s-expression string and
 prepend the string to the input (“''reïnsert''” it).")
 
-  ("{{(@drop NUMBER)}}"
+  ("{{(@drop\xA0;NUMBER)}}"
 
-   "❧ ''Skipping some of the input.''
+   "\x2767;\xA0;''Skipping some of the input.''
 Scheme to drop {{NUMBER}} code points from the front of the input. If
 there are fewer code points remaining, the input is emptied.")
 
-  ("{{($a := (* ($a) (+ ($b) 1)))}}"
+  ("{{($a\xA0;:=\xA0;(*\xA0;($a)\xA0;(+\xA0;($b)\xA0;1)))}}"
 
-   "❧ ''Imperative variables for use in Scheme.''
-The predefined variables are {{$a}} to {{$z}} and
-{{$A}} to {{$Z}}.")
+   "\x2767;\xA0;''Imperative variables for use in Scheme.''
+The predefined variables are {{$a}} to\xA0;{{$z}} and
+{{$A}} to\xA0;{{$Z}}.")
 
   )
 
@@ -171,8 +175,9 @@ egg as
 
 @(==== "Module: (calm1-lib snobol-char-set)")
 
-@"Character set support for {{(calm1-lib snobol-match)}}. There is
-included a test program {{calm1-lib/test-snobol-char-set.scm}}."
+@"Character set support for {{(calm1-lib snobol-match)}}.
+There is included a test program
+{{calm1-lib/test-snobol-char-set.scm}}."
 
 @(=== "Repository")
 

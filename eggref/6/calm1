@@ -5,7 +5,8 @@ calm1: a macro-preprocessor whose goal is to reduce your anxieties
 [[toc:]]
 === Introduction
 
-This macroprocessor runs in R⁷RS Scheme. The accompanying {{calm1.egg}}
+This macroprocessor runs in R⁷RS Scheme.
+The accompanying {{calm1.egg}}
 and {{GNUmakefile}} files are for compiling, installing, and testing
 with CHICKEN 6. The source code can easily be included with any kind
 of project, to be compiled with CHICKEN or run in an interpreter such
@@ -52,7 +53,8 @@ by writing only one {{FORM}} and putting all the branching logic in
 Scheme.</td></tr>
 <tr><td>{{(@ include-raw FORM ...)}} <br>
 {{(@ include FORM ...)}}</td><td>❧ ''Inclusion of file contents or command output.''
-Include the files specified by {{FORM ...}}. The “{{include-raw}}”
+Include the files specified by {{FORM ...}}.
+The “{{include-raw}}”
 version outputs the file contents verbatim. The “{{include}}” version
 inserts the file contents into the macroprocessing stream.
 <br>⁠ If instead of a filename a {{FORM}}
@@ -74,17 +76,19 @@ Remove the most recent macro definition for each given name.</td></tr>
 <tr><td>{{(@ undefine MACRO‑NAME ...)}}</td><td>❧ ''Macro definition removal.''
 Remove all macro definitions corresponding to the given macro names.</td></tr>
 <tr><td>{{(@defn MACRO‑NAME)}}</td><td>❧ ''Macro definition retrieval.''
-Scheme to return the macro handler for {{MACRO‑NAME}}. This macro
+Scheme to return the macro handler for {{MACRO‑NAME}}.
+This macro
 handler can be used as the {{MACRO‑BODY}} for
 {{(@ define ...)}} or
 {{(@ pushdef ...)}}.</td></tr>
 <tr><td>{{(@out FORM)}} <br>
 {{(@out FORM PORT)}}</td><td>❧ ''Outputting text.''
-Scheme to try to convert {{FORM}} to a string and output the string.</td></tr>
+Scheme to try to convert {{FORM}}
+to a string and output the string.</td></tr>
 <tr><td>{{(@outs FORM)}} <br>
 {{(@outs FORM PORT)}}</td><td>❧ ''Outputting an s-expression.''
-Scheme to try to convert {{FORM}} to an s-expression string and output
-the string.</td></tr>
+Scheme to try to convert {{FORM}}
+to an s-expression string and output the string.</td></tr>
 <tr><td>{{(@in FORM)}}</td><td>❧ ''Reïnserting text.''
    Scheme to try to convert {{FORM}} to a string and prepend the
 string to the input (“''reïnsert''” it).</td></tr>
@@ -134,8 +138,9 @@ egg as
 
 ==== Module: (calm1-lib snobol-char-set)
 
-Character set support for {{(calm1-lib snobol-match)}}. There is
-included a test program {{calm1-lib/test-snobol-char-set.scm}}.
+Character set support for {{(calm1-lib snobol-match)}}.
+There is included a test program
+{{calm1-lib/test-snobol-char-set.scm}}.
 
 === Repository
 

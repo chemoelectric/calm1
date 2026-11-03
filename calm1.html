@@ -81,7 +81,8 @@ Scheme.</td></tr>
 <br />
 <tt>(@ include FORM ...)</tt></td>
 <td>❧ <i>Inclusion of file contents or command output.</i>
-Include the files specified by <tt>FORM ...</tt>. The “<tt>include-raw</tt>”
+Include the files specified by <tt>FORM ...</tt>.
+The “<tt>include-raw</tt>”
 version outputs the file contents verbatim. The “<tt>include</tt>” version
 inserts the file contents into the macroprocessing stream.
 
@@ -117,7 +118,8 @@ Remove all macro definitions corresponding to the given macro names.</td></tr>
 <tr>
 <td><tt>(@defn MACRO‑NAME)</tt></td>
 <td>❧ <i>Macro definition retrieval.</i>
-Scheme to return the macro handler for <tt>MACRO‑NAME</tt>. This macro
+Scheme to return the macro handler for <tt>MACRO‑NAME</tt>.
+This macro
 handler can be used as the <tt>MACRO‑BODY</tt> for
 <tt>(@ define ...)</tt> or
 <tt>(@ pushdef ...)</tt>.</td></tr>
@@ -127,15 +129,16 @@ handler can be used as the <tt>MACRO‑BODY</tt> for
 <br />
 <tt>(@out FORM PORT)</tt></td>
 <td>❧ <i>Outputting text.</i>
-Scheme to try to convert <tt>FORM</tt> to a string and output the string.</td></tr>
+Scheme to try to convert <tt>FORM</tt>
+to a string and output the string.</td></tr>
 
 <tr>
 <td><tt>(@outs FORM)</tt> 
 <br />
 <tt>(@outs FORM PORT)</tt></td>
 <td>❧ <i>Outputting an s-expression.</i>
-Scheme to try to convert <tt>FORM</tt> to an s-expression string and output
-the string.</td></tr>
+Scheme to try to convert <tt>FORM</tt>
+to an s-expression string and output the string.</td></tr>
 
 <tr>
 <td><tt>(@in FORM)</tt></td>

@@ -1,0 +1,22 @@
+(@ SECTION "Examples")
+
+(@ PARAGRAPH
+"This documentation itself is written as calm1 macros. Both the
+AsciiDoc for the GitHub README and chalk code that generates
+Subversion wiki for CHICKEN are generated from the same set of calm1
+macros, with minor differences. The macros are run through calm1 by a
+(@ FILE \"GNUmakefile\").")
+
+(@ PARAGRAPH "For AsciiDoc, the macros are
+(@ LINK \"(@ CALM1_CODE)/README.adoc.calm1\" \"README.adoc.calm1\"),
+(@ LINK \"(@ CALM1_CODE)/macros/adoc.calm1\" \"macros/adoc.calm1\"),
+and most of the other macro sources in the
+(@ LINK \"(@ CALM1_CODE)/macros\" \"macros\")
+directory.")
+
+(@ PARAGRAPH "For chalk, the macros are
+(@ LINK \"(@ CALM1_CODE)/calm1.chalk.calm1\" \"calm1.chalk.calm1\"),
+(@ LINK \"(@ CALM1_CODE)/macros/chalk.calm1\" \"macros/chalk.calm1\"),
+and most of the other macro sources in the
+(@ LINK \"(@ CALM1_CODE)/macros\" \"macros\")
+directory.")

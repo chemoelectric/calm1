@@ -1,0 +1,13 @@
+(@ SECTION "Command Usage")
+
+(@ PARAGRAPH
+
+"The (@ CODE \"calm1\") command can be used as a filter in a
+Unix-style pipeline, or with a list of input files and a specified
+output file, or in a mixture of the two usage modes. The command
+options are listed by the “(@ CODE \"calm1 --help\")” command—")
+
+(@ dnl)
+(@ dnl)  Run calm1 to get its usage message.
+(@ dnl)
+(@ SCRIPT "(@ include-raw \"calm1 --help|\")")

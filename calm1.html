@@ -15,11 +15,13 @@
 <li><a href="#requirements">Requirements</a></li>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#syntax">Syntax</a></li>
+<li><a href="#command-usage">Command Usage</a></li>
 <li><a href="#miscellaneous">Miscellaneous</a>
 <ol>
 <li><a href="#module-calm1-lib-define-record-factory">Module: (calm1-lib define-record-factory)</a></li>
 <li><a href="#module-calm1-lib-snobol-match">Module: (calm1-lib snobol-match)</a></li>
 <li><a href="#module-calm1-lib-snobol-char-set">Module: (calm1-lib snobol-char-set)</a></li></ol></li>
+<li><a href="#examples">Examples</a></li>
 <li><a href="#repository">Repository</a></li>
 <li><a href="#author">Author</a></li>
 <li><a href="#version-history">Version History</a></li>
@@ -170,7 +172,34 @@ there are fewer code points remaining, the input is emptied.</td></tr>
 <td>❧ <i>Imperative variables for use in Scheme.</i>
 The predefined variables are <tt>$a</tt>
 to <tt>$z</tt> and
-<tt>$A</tt> to <tt>$Z</tt>.</td></tr></table><a href="#miscellaneous">
+<tt>$A</tt> to <tt>$Z</tt>.</td></tr></table><a href="#command-usage">
+<h3 id="command-usage">Command Usage</h3></a>
+<p>The <tt>calm1</tt> command can be used as a filter in a Unix-style pipeline, or with a list of input files and a specified output file, or in a mixture of the two usage modes. The command options are listed by the “<tt>calm1 --help</tt>” command—</p>
+<pre><tt class="highlight scheme-language"><span class="keyword">Usage:</span> calm1 <span class="paren1">[<span class="default">OPTION</span>]</span>... <span class="paren1">[<span class="default">FILE</span>]</span>...
+Process macros in FILEs. If no FILE or <i><span class="symbol">if</span></i> FILE is “-”, standard input
+is read.
+
+Mandatory or optional arguments to long options are mandatory or optional
+for short options too.
+
+  -D, --define=NAME<span class="paren1">[<span class="default">=VALUE</span>]</span>    <i><span class="symbol">define</span></i> NAME as having VALUE, or empty
+  -U, --undefine=NAME          undefine NAME
+  -o, --output=FILE            output to FILE, or to standard output
+                                 <i><span class="symbol">if</span></i> FILE is “-”
+      --deterministic          deterministic “if”, “while”
+      --nondeterministic       nondeterministic “if”, “while” <span class="paren1">(<span class="default"><i><span class="symbol">default</span></i></span>)</span>
+      --comment-style=STYLE    <span class="keyword">styles:</span>
+                                 '', none <span class="paren1">(<span class="default"><i><span class="symbol">default</span></i></span>)</span>
+                                 scheme, r6rs, r7rs
+      --safe,--safer           do not support inclusion via pipes
+      --less-safe              support inclusion via pipes
+      --help                   display this help and exit
+      --version                output version information and exit
+
+
+If <i><span class="symbol">defined</span></i>, <i><span class="symbol">the</span></i> environment variable “CALM1_PATH” is a colon-separated
+list of directories to search for input files. Otherwise <i><span class="symbol">the</span></i> current
+working directory is searched.</tt></pre><a href="#miscellaneous">
 <h3 id="miscellaneous">Miscellaneous</h3></a>
 <p>The code is meant to be easy to hack on and specialize for a particular project. There are already a lot of things you can do that are undocumented above. For instance, a great amount of Scheme is included in the environment in which macroprocessing is done. It is all available.</p>
 <p>The project appears larger than it actually is, because it includes other reüsable source codes. The author copies such codes from project to project and considers them freely hackable. Included are:</p><a href="#module-calm1-lib-define-record-factory">
@@ -179,7 +208,11 @@ to <tt>$z</tt> and
 <h4 id="module-calm1-lib-snobol-match">Module: (calm1-lib snobol-match)</h4></a>
 <p>SNOBOL4/SPITBOL-like string processing for R⁷RS Scheme. The library works with UTF-32, which is stored internally as R⁶RS-style bytevectors. This style of bytevector is supported in R⁷RS-large as <tt>(except (scheme bytevector) bytevector-copy!)</tt> and in the CHICKEN <tt>r6rs-bytevectors</tt> egg as <tt>(r6rs bytevectors)</tt>. There is included a test program <tt>calm1-lib/test-snobol-match.scm</tt>.</p><a href="#module-calm1-lib-snobol-char-set">
 <h4 id="module-calm1-lib-snobol-char-set">Module: (calm1-lib snobol-char-set)</h4></a>
-<p>Character set support for <tt>(calm1-lib snobol-match)</tt>. There is included a test program <tt>calm1-lib/test-snobol-char-set.scm</tt>.</p><a href="#repository">
+<p>Character set support for <tt>(calm1-lib snobol-match)</tt>. There is included a test program <tt>calm1-lib/test-snobol-char-set.scm</tt>.</p><a href="#examples">
+<h3 id="examples">Examples</h3></a>
+<p>This documentation itself is written as calm1 macros. Both the AsciiDoc for the GitHub README and chalk code that generates Subversion wiki for CHICKEN are generated from the same set of calm1 macros, with minor differences. The macros are run through calm1 by a <tt>GNUmakefile</tt>.</p>
+<p>For AsciiDoc, the macros are <a href="https://github.com/chemoelectric/calm1/blob/main/README.adoc.calm1" class="external">README.adoc.calm1</a>, <a href="https://github.com/chemoelectric/calm1/blob/main/macros/adoc.calm1" class="external">macros/adoc.calm1</a>, and most of the other macro sources in the <a href="https://github.com/chemoelectric/calm1/blob/main/macros" class="external">macros</a> directory.</p>
+<p>For chalk, the macros are <a href="https://github.com/chemoelectric/calm1/blob/main/calm1.chalk.calm1" class="external">calm1.chalk.calm1</a>, <a href="https://github.com/chemoelectric/calm1/blob/main/macros/chalk.calm1" class="external">macros/chalk.calm1</a>, and most of the other macro sources in the <a href="https://github.com/chemoelectric/calm1/blob/main/macros" class="external">macros</a> directory.</p><a href="#repository">
 <h3 id="repository">Repository</h3></a>
 <p>This software is hosted on GitHub:</p>
 <p><a href="https://github.com/chemoelectric/calm1" class="external">https://github.com/chemoelectric/calm1</a></p><a href="#author">

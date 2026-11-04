@@ -16,4 +16,5 @@
 (@ define "TABLERIGHT" "\"(@ TABLEBULLET)(@ 1)\"")(@ dnl)
 (@ define "SYNTAXTABLE" "@(table (@ 1))")(@ dnl)
 (@ define "SYNTAXTABLEENTRY" "(\"(@ 1)\"\n\n(@ 2))")(@ dnl)
+(@ define "SCRIPT" "@(script\n #<<EOS\n(@ 1)EOS\n)")(@ dnl)
 (@ define "LINK" "[[(@ 1)|(@ 2)]]")(@ dnl)

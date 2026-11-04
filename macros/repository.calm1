@@ -1,5 +1,5 @@
 (@ SECTION "Repository")
-(@ PARAGRAPH "This software is hosted on GitHub:")
 (@ PARAGRAPH
-   "(@ LINK \"https://github.com/chemoelectric/calm1\"
-            \"https://github.com/chemoelectric/calm1\")")
+"This software is hosted on GitHub:")
+(@ PARAGRAPH
+"(@ LINK \"(@ CALM1_REPO)\" \"(@ CALM1_REPO)\")")

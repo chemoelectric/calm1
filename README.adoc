@@ -1,4 +1,12 @@
 == calm1: a macro-preprocessor to reduce your anxieties
+=== Requirements
+
+
+
+
+For CHICKEN 6, the following eggs are required:
+http://wiki.call-cc.org/eggref/6/srfi-1[srfi-1], http://wiki.call-cc.org/eggref/6/srfi-14[srfi-14], http://wiki.call-cc.org/eggref/6/srfi-37[srfi-37], http://wiki.call-cc.org/eggref/6/srfi-143[srfi-143], http://wiki.call-cc.org/eggref/6/r6rs-bytevectors[r6rs-bytevectors].
+
 === Introduction
 
 This macroprocessor runs in R⁷RS Scheme.
@@ -178,6 +186,42 @@ to ++$z++ and
 
 |===
 
+=== Command Usage
+
+The ++calm1++ command can be used as a filter in a
+Unix-style pipeline, or with a list of input files and a specified
+output file, or in a mixture of the two usage modes. The command
+options are listed by the “++calm1 --help++” command—
+
+----
+Usage: calm1 [OPTION]... [FILE]...
+Process macros in FILEs. If no FILE or if FILE is “-”, standard input
+is read.
+
+Mandatory or optional arguments to long options are mandatory or optional
+for short options too.
+
+  -D, --define=NAME[=VALUE]    define NAME as having VALUE, or empty
+  -U, --undefine=NAME          undefine NAME
+  -o, --output=FILE            output to FILE, or to standard output
+                                 if FILE is “-”
+      --deterministic          deterministic “if”, “while”
+      --nondeterministic       nondeterministic “if”, “while” (default)
+      --comment-style=STYLE    styles:
+                                 '', none (default)
+                                 scheme, r6rs, r7rs
+      --safe,--safer           do not support inclusion via pipes
+      --less-safe              support inclusion via pipes
+      --help                   display this help and exit
+      --version                output version information and exit
+
+
+If defined, the environment variable “CALM1_PATH” is a colon-separated
+list of directories to search for input files. Otherwise the current
+working directory is searched.
+----
+
+
 === Miscellaneous
 
 The code is meant to be easy to hack on and specialize for a particular
@@ -217,13 +261,27 @@ Character set support for ++(calm1-lib snobol-match)++.
 There is included a test program
 ++calm1-lib/test-snobol-char-set.scm++.
 
-=== Requirements
+=== Examples
 
+This documentation itself is written as calm1 macros. Both the
+AsciiDoc for the GitHub README and chalk code that generates
+Subversion wiki for CHICKEN are generated from the same set of calm1
+macros, with minor differences. The macros are run through calm1 by a
+++GNUmakefile++.
 
+For AsciiDoc, the macros are
+https://github.com/chemoelectric/calm1/blob/main/README.adoc.calm1[README.adoc.calm1],
+https://github.com/chemoelectric/calm1/blob/main/macros/adoc.calm1[macros/adoc.calm1],
+and most of the other macro sources in the
+https://github.com/chemoelectric/calm1/blob/main/macros[macros]
+directory.
 
-
-For CHICKEN 6, the following eggs are required:
-http://wiki.call-cc.org/eggref/6/srfi-1[srfi-1], http://wiki.call-cc.org/eggref/6/srfi-14[srfi-14], http://wiki.call-cc.org/eggref/6/srfi-37[srfi-37], http://wiki.call-cc.org/eggref/6/srfi-143[srfi-143], http://wiki.call-cc.org/eggref/6/r6rs-bytevectors[r6rs-bytevectors].
+For chalk, the macros are
+https://github.com/chemoelectric/calm1/blob/main/calm1.chalk.calm1[calm1.chalk.calm1],
+https://github.com/chemoelectric/calm1/blob/main/macros/chalk.calm1[macros/chalk.calm1],
+and most of the other macro sources in the
+https://github.com/chemoelectric/calm1/blob/main/macros[macros]
+directory.
 
 === Repository
 This software is hosted on GitHub:

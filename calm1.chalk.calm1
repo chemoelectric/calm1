@@ -2,5 +2,7 @@
 (@ include "macros/requirements.calm1")
 (@ include "macros/introduction.calm1")
 (@ include "macros/syntax.calm1")
+(@ include "macros/command-usage.calm1")
 (@ include "macros/miscellaneous.calm1")
+(@ include "macros/examples.calm1")
 (@ include "macros/repository.calm1")

@@ -166,6 +166,15 @@ prepend the string to the input
 
 
 
+|++(@raw NUMBER)++
+
+|❧ __Raw outputting of the input.__ Scheme
+to output ++NUMBER++ code points from the front of the
+input. If there are fewer code points remaining, the entire input is
+outputted. All outputted code points are removed from the input.
+
+
+
 |++(@drop NUMBER)++
 
 |❧ __Skipping some of the input.__

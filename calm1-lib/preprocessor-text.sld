@@ -36,11 +36,12 @@
 
   (export preprocessor-text
           set-preprocessor-text!
-          @drop
           @in
           @ins
           @out
           @outs
+          @raw
+          @drop
           preprocessor-serialize
           preprocessor-stringize
           preprocessor-read-to-string
@@ -71,6 +72,12 @@
              (len (min n (utf32-string-length text))))
         (set-preprocessor-text!
          (utf32-string-copy text len))))
+
+    (define (@raw n)
+      (let* ((text (preprocessor-text))
+             (len (min n (utf32-string-length text))))
+        (@out (utf32-string-copy text 0 len))
+        (@drop len)))
 
     (define (@in str)
       (set-preprocessor-text!

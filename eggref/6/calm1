@@ -104,6 +104,10 @@ Scheme to try to convert {{FORM}}
 to an s-expression string and
 prepend the string to the input
 (“''reïnsert''” it).</td></tr>
+<tr><td>{{(@raw NUMBER)}}</td><td>❧ ''Raw outputting of the input.'' Scheme
+to output {{NUMBER}} code points from the front of the
+input. If there are fewer code points remaining, the entire input is
+outputted. All outputted code points are removed from the input.</td></tr>
 <tr><td>{{(@drop NUMBER)}}</td><td>❧ ''Skipping some of the input.''
 Scheme to drop {{NUMBER}} code points from the front of the input. If
 there are fewer code points remaining, the input is emptied.</td></tr>

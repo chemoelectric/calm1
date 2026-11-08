@@ -1,0 +1,1 @@
+* Add means to look ahead at input.

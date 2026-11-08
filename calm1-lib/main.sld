@@ -496,12 +496,11 @@
       (define include-raw-handler
         (make-macro-handler
          (lambda (macro-call macro-name macro-body)
-           (let-values ((filenames (evaluate macro-body)))
-             (do ((f filenames (cdr f)))
-                 ((null? f))
-               (find-file-and-use-it-for-input (car f)
-                 (lambda ()
-                   (@out (preprocessor-read-to-string)))))))))
+           (let ((n1 (utf32-string-length (preprocessor-text))))
+             (make-inclusion macro-body)
+             (let* ((n2 (utf32-string-length (preprocessor-text)))
+                    (dn (- n2 n1)))
+               (@raw dn))))))
 
       ;;----------------------------------------------------
       ;; (@ include FORM ...)
@@ -512,12 +511,15 @@
       (define include-handler
         (make-macro-handler
          (lambda (macro-call macro-name macro-body)
-           (let-values ((filenames (evaluate macro-body)))
+           (make-inclusion macro-body))))
+
+      (define (make-inclusion macro-body)
+        (let-values ((filenames (evaluate macro-body)))
              (do ((f (reverse filenames) (cdr f)))
                  ((null? f))
                (find-file-and-use-it-for-input (car f)
                  (lambda ()
-                   (@in (preprocessor-read-to-string)))))))))
+                   (@in (preprocessor-read-to-string)))))))
 
       ;;----------------------------------------------------
       ;; (@ define MACRO-NAME MACRO-BODY)
@@ -705,8 +707,7 @@
                                     (handle-line-comment match-result)
                                     (loop)))
               (else
-               (@out (utf32-string-copy (preprocessor-text) 0 1))
-               (@drop 1)
+               (@raw 1)
                (loop)))))
 
     (define (run-the-program comment-style definitions

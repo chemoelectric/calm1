@@ -265,9 +265,6 @@
                                   " )")
                    (*environment*)))
 
-    (define serialize preprocessor-serialize)
-    (define stringize preprocessor-stringize)
-
     (define (getvar key match-result)
       (and match-result
            (let ((p (assoc key (cdr match-result))))
@@ -279,8 +276,6 @@
         (if (<= n m)
           empty-string
           (utf32-string-copy str m))))
-
-    (define read-to-string preprocessor-read-to-string)
 
 ;;;---------------------------------------------------------------------
 
@@ -348,11 +343,12 @@
       ;;
       (make-parameter #f))
 
-    (define (process-text comment-style definitions text output-port)
+    (define (process-text comment-style definitions text)
 
       (define (remove-t-prefix! prefix)
         (set-preprocessor-text!
-         (remove-prefix (stringize prefix) (preprocessor-text))))
+         (remove-prefix (preprocessor-stringize prefix)
+                        (preprocessor-text))))
 
       ;;----------------------------------------------------
       ;; (@ eval FORM ...)
@@ -370,7 +366,7 @@
          (lambda (macro-call macro-name macro-body)
            (let-values ((form-lst (evaluate macro-body)))
              (for-each (lambda (form)
-                         (@out (serialize form) output-port))
+                         (@out (preprocessor-serialize form)))
                        form-lst)))))
 
       (define hide-handler
@@ -505,7 +501,7 @@
                  ((null? f))
                (find-file-and-use-it-for-input (car f)
                  (lambda ()
-                   (@out (read-to-string) output-port))))))))
+                   (@out (preprocessor-read-to-string)))))))))
 
       ;;----------------------------------------------------
       ;; (@ include FORM ...)
@@ -521,7 +517,7 @@
                  ((null? f))
                (find-file-and-use-it-for-input (car f)
                  (lambda ()
-                   (@in (read-to-string)))))))))
+                   (@in (preprocessor-read-to-string)))))))))
 
       ;;----------------------------------------------------
       ;; (@ define MACRO-NAME MACRO-BODY)
@@ -550,7 +546,7 @@
           (lambda (i value)
             (@in (utf32-string-append
                   before (number->utf32-string i)
-                  between (serialize value) after)))))
+                  between (preprocessor-serialize value) after)))))
 
       (define-syntax define-macro
         (syntax-rules ()
@@ -629,7 +625,7 @@
       (define (handle-quick-result match-result)
         (let ((snippet (getvar 'snippet match-result)))
           (remove-t-prefix! snippet)
-          (@out snippet output-port)))
+          (@out snippet)))
 
       (define (handle-macro-call match-result)
         (let ((macro-call (getvar 'macro-call match-result))
@@ -638,19 +634,19 @@
           (remove-t-prefix! macro-call)
           (let ((macro-handler (get-macro-handler macro-name)))
             (if (not macro-handler)
-              (@out macro-call output-port)
+              (@out macro-call)
               ((macro-handler-procedure macro-handler)
                macro-call macro-name macro-body)))))
 
       (define (handle-line-comment match-result)
         (let ((comment (getvar 'comment match-result)))
           (remove-t-prefix! comment)
-          (@out comment output-port)))
+          (@out comment)))
 
       (define (handle-form-comment match-result)
         (let ((comment (getvar 'comment match-result)))
           (remove-t-prefix! comment)
-          (@out comment output-port)))
+          (@out comment)))
 
       (define (apply-definitions-list definitions)
         (do ((defs definitions (cdr defs)))
@@ -661,9 +657,10 @@
             (if define?
               ((macro-handler-procedure definition-handler)
                empty-string empty-string
-               (utf32-string-append (serialize macro-name)
-                                    one-space
-                                    (serialize macro-body)))
+               (utf32-string-append
+                (preprocessor-serialize macro-name)
+                one-space
+                (preprocessor-serialize macro-body)))
               (remove-macro-handlers! macro-name)))))
 
       (set-preprocessor-text! (utf32-string-copy text))
@@ -708,8 +705,7 @@
                                     (handle-line-comment match-result)
                                     (loop)))
               (else
-               (@out (utf32-string-copy (preprocessor-text) 0 1)
-                     output-port)
+               (@out (utf32-string-copy (preprocessor-text) 0 1))
                (@drop 1)
                (loop)))))
 
@@ -727,7 +723,7 @@
                  (input-port (if use-stdin?
                                (current-input-port)
                                (find-and-open-input-file input-file))))
-            (let ((text (read-to-string input-port)))
+            (let ((text (preprocessor-read-to-string input-port)))
               (set! texts (append! texts (list text))))
             (unless use-stdin?
               (close-input-port input-port))))
@@ -738,9 +734,9 @@
             (set-bracket-pairs!
              (cons (cons scheme-comment-left scheme-comment-right)
                    (bracket-pairs)))))
-         (process-text comment-style definitions
-                       (utf32-string-concatenate texts)
-                       output-port))
+         (parameterize ((current-output-port output-port))
+           (process-text comment-style definitions
+                         (utf32-string-concatenate texts))))
         (unless use-stdout?
           (close-output-port output-port))))
 

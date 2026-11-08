@@ -281,7 +281,6 @@
           (utf32-string-copy str m))))
 
     (define read-to-string preprocessor-read-to-string)
-    (define display-as-string preprocessor-display-as-string)
 
 ;;;---------------------------------------------------------------------
 
@@ -355,9 +354,6 @@
         (set-preprocessor-text!
          (remove-prefix (stringize prefix) (preprocessor-text))))
 
-      (define (output-to-port obj)
-        (display-as-string obj output-port))
-
       ;;----------------------------------------------------
       ;; (@ eval FORM ...)
       ;; (@ hide FORM ...)
@@ -374,7 +370,7 @@
          (lambda (macro-call macro-name macro-body)
            (let-values ((form-lst (evaluate macro-body)))
              (for-each (lambda (form)
-                         (output-to-port (serialize form)))
+                         (@out (serialize form) output-port))
                        form-lst)))))
 
       (define hide-handler
@@ -509,7 +505,7 @@
                  ((null? f))
                (find-file-and-use-it-for-input (car f)
                  (lambda ()
-                   (output-to-port (read-to-string)))))))))
+                   (@out (read-to-string) output-port))))))))
 
       ;;----------------------------------------------------
       ;; (@ include FORM ...)
@@ -633,7 +629,7 @@
       (define (handle-quick-result match-result)
         (let ((snippet (getvar 'snippet match-result)))
           (remove-t-prefix! snippet)
-          (output-to-port snippet)))
+          (@out snippet output-port)))
 
       (define (handle-macro-call match-result)
         (let ((macro-call (getvar 'macro-call match-result))
@@ -642,19 +638,19 @@
           (remove-t-prefix! macro-call)
           (let ((macro-handler (get-macro-handler macro-name)))
             (if (not macro-handler)
-              (output-to-port macro-call)
+              (@out macro-call output-port)
               ((macro-handler-procedure macro-handler)
                macro-call macro-name macro-body)))))
 
       (define (handle-line-comment match-result)
         (let ((comment (getvar 'comment match-result)))
           (remove-t-prefix! comment)
-          (output-to-port comment)))
+          (@out comment output-port)))
 
       (define (handle-form-comment match-result)
         (let ((comment (getvar 'comment match-result)))
           (remove-t-prefix! comment)
-          (output-to-port comment)))
+          (@out comment output-port)))
 
       (define (apply-definitions-list definitions)
         (do ((defs definitions (cdr defs)))
@@ -712,8 +708,8 @@
                                     (handle-line-comment match-result)
                                     (loop)))
               (else
-               (output-to-port (utf32-string-copy
-                                (preprocessor-text) 0 1))
+               (@out (utf32-string-copy (preprocessor-text) 0 1)
+                     output-port)
                (@drop 1)
                (loop)))))
 

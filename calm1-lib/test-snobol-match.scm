@@ -1,63 +1,76 @@
-;;; Copyright (c) 2026 Barry Schwartz
-;;;
-;;; Permission is hereby granted, free of charge, to any person
-;;; obtaining a copy of this software and associated documentation
-;;; files (the "Software"), to deal in the Software without
-;;; restriction, including without limitation the rights to use,
-;;; copy, modify, merge, publish, distribute, sublicense, and/or sell
-;;; copies of the Software, and to permit persons to whom the
-;;; Software is furnished to do so, subject to the following
-;;; conditions:
-;;;
-;;; The above copyright notice and this permission notice shall be
-;;; included in all copies or substantial portions of the Software.
-;;;
-;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-;;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-;;; OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-;;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-;;; HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-;;; WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-;;; OTHER DEALINGS IN THE SOFTWARE.
+;; Copyright © 2026 Barry Schwartz
+;;
+;; Permission is hereby granted, free of charge, to any person
+;; obtaining a copy of this software and associated documentation
+;; files (the "Software"), to deal in the Software without
+;; restriction, including without limitation the rights to use, copy,
+;; modify, merge, publish, distribute, sublicense, and/or sell copies
+;; of the Software, and to permit persons to whom the Software is
+;; furnished to do so, subject to the following conditions: The above
+;; copyright notice and this permission notice shall be included in
+;; all copies or substantial portions of the Software.
+;;
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+;; BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+;; ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;; SOFTWARE.
 
 (import (scheme base)
         (scheme char)
         (scheme write)
         (scheme process-context)
-        (calm1-lib utf32-string)
+        (calm1-lib uc-string)
         (calm1-lib snobol-match))
 
-(define (->utf32 s)
-  (cond ((string? s) (string->utf32-string s))
+(define (->uc s)
+  (cond ((string? s) (string->uc-string s))
         (else s)))
 
 (define (string-contains? haystack needle)
-  (let ((haystack (->utf32 haystack))
-        (needle (->utf32 needle)))
-    (let ((n-len (utf32-string-length needle))
-          (h-len (utf32-string-length haystack)))
+  (let ((haystack (->uc haystack))
+        (needle (->uc needle)))
+    (let ((n-len (uc-string-length needle))
+          (h-len (uc-string-length haystack)))
       (cond ((zero? n-len) #t)
             ((> n-len h-len) #f)
             (else
              (let loop ((i 0))
                (if (> (+ i n-len) h-len)
                  #f
-                 (if (utf32-string=? needle
-                                     (utf32-string-copy
-                                      haystack i (+ i n-len)))
+                 (if (uc-string=? needle
+                                  (uc-string-copy
+                                   haystack i (+ i n-len)))
                    #t
                    (loop (+ i 1))))))))))
+
+(define (really-equal? a b)
+  (if (uc-string? a)
+    (and (uc-string? b) (uc-string=? a b))
+    (equal? a b)))
 
 ;; Core assertion tracking procedure.
 ;; Evaluates a thunk; if the return value doesn't match expected data, 
 ;; it aborts execution immediately with a diagnostic message and exit code 1.
 (define (assert-equal? label expected actual)
-  (if (not (equal? expected actual))
+  (if (not (really-equal? expected actual))
     (begin
       (display "FAIL: ") (display label) (newline)
-      (display "  Expected: ") (write expected) (newline)
-      (display "  Actual:   ") (write actual) (newline)
+      (display "  Expected: ")
+      (write expected)
+      (when (uc-string? expected)
+        (display " ")
+        (write (uc-string->string expected)))
+      (newline)
+      (display "  Actual:   ")
+      (write actual)
+      (when (uc-string? actual)
+        (display " ")
+        (write (uc-string->string actual)))
+      (newline)
       (exit 1))))
 
 ;; Helper to extract a bound key's value directly out of a successful match
@@ -78,27 +91,27 @@
   (assert-equal? "p:lit empty string on empty input"
                  0
                  (car (snobol-match (p:lit "")
-                                    (->utf32 ""))))
+                                    (->uc ""))))
 
   (assert-equal? "p:lit empty string on populated input (non-consuming match)"
                  0
                  (car (snobol-match (p:lit "")
-                                    (->utf32 "abcdef"))))
+                                    (->uc "abcdef"))))
 
   (assert-equal? "p:arb on pure empty string input"
                  0
                  (car (snobol-match (p:arb)
-                                    (->utf32 ""))))
+                                    (->uc ""))))
 
   (assert-equal? "p:maybe-many wrapping an empty literal (prevents infinite loop)"
                  0
                  (car (snobol-match (p:maybe-many (p:lit ""))
-                                    (->utf32 "abc"))))
+                                    (->uc "abc"))))
 
   (assert-equal? "p:maybe-many when matching pattern is entirely absent"
                  0
                  (car (snobol-match (p:maybe-many (p:lit "xyz"))
-                                    (->utf32 "abcdef"))))
+                                    (->uc "abcdef"))))
 
 
   ;; ====================================================================
@@ -116,7 +129,7 @@
   ;; Verifies p:break matches cleanly up to the boundary without internal shifting.
   (let ((break-test (p:seq (p:assign-local (p:break "b") 'break-data) (p:lit "b"))))
     (assert-equal? "p:break matches up to the designated character delimiter atomically"
-                   (->utf32 "xyzaa")
+                   (->uc "xyzaa")
                    (get-var (snobol-match break-test "xyzaab") 'break-data)))
 
   ;; 1. p:span verification (Atomic non-backtracking check)
@@ -155,7 +168,7 @@
                    13
                    (car (snobol-match breakx-jump-pat "xyzab_and_abc")))
     (assert-equal? "p:breakx variable capture tracking matches up to the final jump point"
-                   (->utf32 "xyzab_and_a")
+                   (->uc "xyzab_and_a")
                    (get-var (snobol-match breakx-jump-pat "xyzab_and_abc") 'captured-prefix)))
 
   ;; ====================================================================
@@ -169,7 +182,7 @@
   (let ((arbno-min (p:seq (p:assign-local (p:arbno (p:lit "a")) 'seq-data) 
                           (p:arb))))
     (assert-equal? "p:arbno initially prioritizes matching zero characters"
-                   (->utf32 "")
+                   (->uc "")
                    (get-var (snobol-match arbno-min "abc") 'seq-data)))
 
   ;; 2. ARBNO expansion check via downstream anchoring
@@ -178,7 +191,7 @@
   (let ((arbno-expand (p:seq (p:assign-local (p:arbno (p:lit "a")) 'seq-data) 
                              (p:lit "b"))))
     (assert-equal? "p:arbno expands iteratively when forced by downstream patterns"
-                   (->utf32 "aaa")
+                   (->uc "aaa")
                    (get-var (snobol-match arbno-expand "aaab") 'seq-data)))
 
   ;; 3. ARBNO infinite loop prevention check
@@ -256,13 +269,13 @@
 
   (let ((empty-match (snobol-match (p:lit "") "test")))
     (assert-equal? "snobol-replace with empty recipe list on valid match"
-                   (->utf32 "")
+                   (->uc "")
                    (snobol-replace empty-match '())))
 
   (let* ((p (p:seq (p:assign-local (p:lit "foo") 'k)))
          (res (snobol-match p "foobar")))
     (assert-equal? "snobol-replace handling unregistered/missing lookup keys gracefully"
-                   (->utf32 "foo-missing-")
+                   (->uc "foo-missing-")
                    (snobol-replace res '(k "-missing-" missing_key))))
 
 
@@ -304,7 +317,7 @@
   (let ((imm-match (p:seq (p:immediate-assign (p:span "0123456789") 'weight)
                           (p:lit "lbs"))))
     (assert-equal? "p:immediate-assign captures text segments on successful sub-paths"
-                   (->utf32 "123")
+                   (->uc "123")
                    (get-var (snobol-match imm-match "123lbs") 'weight)))
 
   ;; 2. Tracking intermediate state inside recursive branches
@@ -315,7 +328,7 @@
                            (p:lit "z"))))
     ;; Input: "az". Matches 'a', sets 'first-vowel to "a", matches "z". Success!
     (assert-equal? "p:immediate-assign logs state correctly before downstream execution"
-                   (->utf32 "a")
+                   (->uc "a")
                    (get-var (snobol-match imm-track "az") 'first-vowel)))
 
   ;; ====================================================================
@@ -328,7 +341,7 @@
                            (p:cursor 'pos) 
                            (p:lit "def"))))
     (assert-equal? "p:cursor logs the precise numeric match index position"
-                   (->utf32 "3")
+                   (->uc "3")
                    (get-var (snobol-match cursor-pat "abcdef") 'pos)))
 
   ;; 2. Bracketing a matched slice with two cursors
@@ -340,17 +353,17 @@
                                (p:cursor 'end-idx))))
     (let ((res (snobol-match span-bound-pat "   target   ")))
       (assert-equal? "p:cursor tracks starting index boundary cleanly"
-                     (->utf32 "3")
+                     (->uc "3")
                      (get-var res 'start-idx))
       (assert-equal? "p:cursor tracks ending index boundary cleanly"
-                     (->utf32 "9")
+                     (->uc "9")
                      (get-var res 'end-idx))))
 
   ;; ====================================================================
   ;; 10. SPITBOL BRANCH TRUNCATION & COMPACTION SUITE
   ;; ====================================================================
 
- ;; 1. ABORT execution roadblock check
+  ;; 1. ABORT execution roadblock check
   ;; Alternation tries to match "xyz" and succeeds, hitting ABORT. 
   ;; Even though "xyz" is also available as a fallback alternative, 
   ;; ABORT terminates the entire match attempt, returning #f.
@@ -376,7 +389,7 @@
     (let ((res (snobol-match dupe-pat "123")))
       ;; The final structure should contain exactly one unique instance of 'x mapping to "3"
       (assert-equal? "Environment compaction retains only the final written state"
-                     (->utf32 "3")
+                     (->uc "3")
                      (get-var res 'x))
       (assert-equal? "Environment contains no duplicate key definitions after compaction"
                      1

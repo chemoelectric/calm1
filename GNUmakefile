@@ -22,7 +22,7 @@
 .DELETE_ON_ERROR:
 .DEFAULT_GOAL := default
 
-VERSION = 1.0.2
+VERSION = 1.0.3
 
 CHEMOELECTRIC = https://github.com/chemoelectric
 CALM1_REPO = $(CHEMOELECTRIC)/calm1
@@ -53,7 +53,7 @@ CALM1_DOC_SRC = \
 		syntax.calm1 \
 		syntax-table.calm1)
 
-.PHONY: default all clean veryclean
+.PHONY: default all clean maintainer-clean
 default: all
 
 all:: calm1
@@ -62,12 +62,18 @@ all:: calm1
 	$(CALM1_R7RS) $(CALM1_FLAGS) $(<) -o $(@)
 %.sld: %.sld.calm1
 	$(CALM1_R7RS) $(CALM1_FLAGS) $(<) -o $(@)
-veryclean:: ; -rm -f calm1.egg calm1-lib/version.sld
+all:: calm1.egg calm1-lib/version.sld
+maintainer-clean:: ; -rm -f calm1.egg calm1-lib/version.sld
+
+calm1-lib/uc-string.sld: calm1-lib/unicode0.body.scm
+calm1-lib/uc-string.sld: calm1-lib/unicode4.body.scm
+all:: calm1-lib/uc-string.sld
+maintainer-clean:: ; -rm -f calm1-lib/uc-string.sld
 
 %.adoc: %.adoc.calm1 macros/adoc.calm1 $(CALM1_DOC_SRC) GNUmakefile
 	$(CALM1) $(CALM1_FLAGS) $(<) -o $(@)
 all:: README.adoc
-veryclean:: ; -rm -f README.adoc
+maintainer-clean:: ; -rm -f README.adoc
 
 %.chalk: %.chalk.calm1 macros/chalk.calm1 $(CALM1_DOC_SRC) GNUmakefile
 	$(CALM1) $(CALM1_FLAGS) $(<) -o $(@)
@@ -77,7 +83,7 @@ eggref/6/%: %.chalk
 %.html: eggref/6/%
 	$(SVNWIKI2HTML) $(<) > $(@)
 all:: calm1.chalk eggref/6/calm1 calm1.html
-veryclean:: ; -rm -f calm1.chalk eggref/6/calm1 calm1.html
+maintainer-clean:: ; -rm -f calm1.chalk eggref/6/calm1 calm1.html
 
 eggref/6: GNUmakefile
 	mkdir -p eggref/6
@@ -87,7 +93,7 @@ calm1: calm1.egg \
 		calm1-lib/version.sld \
 		calm1-lib/define-record-factory.sld \
 		calm1-lib/random-fixnum.sld \
-		calm1-lib/utf32-string.sld \
+		calm1-lib/uc-string.sld \
 		calm1-lib/snobol-match.sld \
 		calm1-lib/snobol-char-set.sld \
 		calm1-lib/preprocessor-define-lookup.sld \

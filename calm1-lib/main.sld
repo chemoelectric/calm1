@@ -1,26 +1,23 @@
-;;; Copyright (c) 2026 Barry Schwartz
-;;;
-;;; Permission is hereby granted, free of charge, to any person
-;;; obtaining a copy of this software and associated documentation
-;;; files (the "Software"), to deal in the Software without
-;;; restriction, including without limitation the rights to use,
-;;; copy, modify, merge, publish, distribute, sublicense, and/or sell
-;;; copies of the Software, and to permit persons to whom the
-;;; Software is furnished to do so, subject to the following
-;;; conditions:
-;;;
-;;; The above copyright notice and this permission notice shall be
-;;; included in all copies or substantial portions of the Software.
-;;;
-;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-;;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-;;; OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-;;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-;;; HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-;;; WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-;;; OTHER DEALINGS IN THE SOFTWARE.
-
+;; Copyright © 2026 Barry Schwartz
+;;
+;; Permission is hereby granted, free of charge, to any person
+;; obtaining a copy of this software and associated documentation
+;; files (the "Software"), to deal in the Software without
+;; restriction, including without limitation the rights to use, copy,
+;; modify, merge, publish, distribute, sublicense, and/or sell copies
+;; of the Software, and to permit persons to whom the Software is
+;; furnished to do so, subject to the following conditions: The above
+;; copyright notice and this permission notice shall be included in
+;; all copies or substantial portions of the Software.
+;;
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+;; BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+;; ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;; SOFTWARE.
 ;;;---------------------------------------------------------------------
 
 (define-library (calm1-lib main)
@@ -63,7 +60,7 @@
     (else (import (srfi srfi-143))))
 
   (import (calm1-lib version)
-          (calm1-lib utf32-string)
+          (calm1-lib uc-string)
           (calm1-lib snobol-match)
           (calm1-lib snobol-char-set)
           (calm1-lib random-fixnum)
@@ -124,7 +121,7 @@
           ((library (srfi 143)) (quote (srfi 143)))
           (loko (quote (srfi :143 fixnums)))
           (else (quote (srfi srfi-143))))
-        '(calm1-lib utf32-string)
+        '(calm1-lib uc-string)
         '(calm1-lib snobol-match)
         '(calm1-lib snobol-char-set)
         '(calm1-lib random-fixnum)
@@ -215,26 +212,19 @@
 
 ;;;---------------------------------------------------------------------
 
-    (define (utf32-string? obj)
-      ;;
-      ;; FIXME: This will suffice unless we put a proper first-class
-      ;; wrapper on utf32-string.
-      ;;
-      (bytevector? obj))
-
-    (define (->utf32 str)
-      (cond ((string? str) (string->utf32-string str))
+    (define (->uc str)
+      (cond ((string? str) (string->uc-string str))
             (else str)))
 
-    (define (utf32-> str)
-      (cond ((utf32-string? str) (utf32-string->string str))
+    (define (uc-> str)
+      (cond ((uc-string? str) (uc-string->string str))
             (else str)))
 
-    (define empty-string (string->utf32-string ""))
-    (define (spaces n) (string->utf32-string (make-string n #\x20)))
+    (define empty-string (string->uc-string ""))
+    (define (spaces n) (string->uc-string (make-string n #\x20)))
     (define one-space (spaces 1))
-    (define macro-open (string->utf32-string "(@ "))
-    (define macro-close (string->utf32-string ")"))
+    (define macro-open (string->uc-string "(@ "))
+    (define macro-close (string->uc-string ")"))
 
     (define random-fixnum
       (make-random-fixnum))
@@ -259,8 +249,8 @@
 
     (define (evaluate str)
       (eval-string (string-append "(values "
-                                  (if (bytevector? str)
-                                    (utf32-string->string str)
+                                  (if (uc-string? str)
+                                    (uc-string->string str)
                                     str)
                                   " )")
                    (*environment*)))
@@ -271,11 +261,11 @@
              (and p (cdr p)))))
 
     (define (remove-prefix prefix str)
-      (let ((m (utf32-string-length prefix))
-            (n (utf32-string-length str)))
+      (let ((m (uc-string-length prefix))
+            (n (uc-string-length str)))
         (if (<= n m)
           empty-string
-          (utf32-string-copy str m))))
+          (uc-string-copy str m))))
 
 ;;;---------------------------------------------------------------------
 
@@ -288,12 +278,12 @@
                            (string->char-set "()[]{};|'`,@\"\\")))
 
     (define (macro-name? str)
-      (let ((n (utf32-string-length str)))
+      (let ((n (uc-string-length str)))
         (and (not (zero? n))
              (let loop ((i 0))
                (cond ((= i n) #t)
                      ((char-set-contains? char-set:macro-name
-                                          (utf32-string-ref str i))
+                                          (uc-string-ref str i))
                       (loop (+ i 1)))
                      (else #f))))))
 
@@ -385,7 +375,7 @@
                (let ((match-result
                       (snobol-match pattern (preprocessor-text))))
                  (when match-result
-                   (let ((n (utf32-string->number
+                   (let ((n (uc-string->number
                              (getvar 'cursor match-result))))
                      (@drop n)))))))))
 
@@ -480,7 +470,7 @@
                        ;; Reinsert both the expansion and the
                        ;; (@ while ...)
                        (lambda ignored
-                         (@in (utf32-string-append
+                         (@in (uc-string-append
                                macro-open
                                macro-name one-space macro-body
                                macro-close))))
@@ -496,9 +486,9 @@
       (define include-raw-handler
         (make-macro-handler
          (lambda (macro-call macro-name macro-body)
-           (let ((n1 (utf32-string-length (preprocessor-text))))
+           (let ((n1 (uc-string-length (preprocessor-text))))
              (make-inclusion macro-body)
-             (let* ((n2 (utf32-string-length (preprocessor-text)))
+             (let* ((n2 (uc-string-length (preprocessor-text)))
                     (dn (- n2 n1)))
                (@raw dn))))))
 
@@ -515,11 +505,11 @@
 
       (define (make-inclusion macro-body)
         (let-values ((filenames (evaluate macro-body)))
-             (do ((f (reverse filenames) (cdr f)))
-                 ((null? f))
-               (find-file-and-use-it-for-input (car f)
-                 (lambda ()
-                   (@in (preprocessor-read-to-string)))))))
+          (do ((f (reverse filenames) (cdr f)))
+              ((null? f))
+            (find-file-and-use-it-for-input (car f)
+              (lambda ()
+                (@in (preprocessor-read-to-string)))))))
 
       ;;----------------------------------------------------
       ;; (@ define MACRO-NAME MACRO-BODY)
@@ -535,27 +525,27 @@
       ;;
 
       (define reinsert-popdef-i!
-        (let ((before (->utf32 "(@ popdef \""))
-              (after (->utf32 "\")")))
+        (let ((before (->uc "(@ popdef \""))
+              (after (->uc "\")")))
           (lambda (i)
-            (@in (utf32-string-append
-                  before (number->utf32-string i) after)))))
+            (@in (uc-string-append
+                  before (number->uc-string i) after)))))
 
       (define reinsert-pushdef-i!
-        (let ((before (->utf32 "(@ pushdef \""))
-              (between (->utf32 "\" "))
-              (after (->utf32 ")")))
+        (let ((before (->uc "(@ pushdef \""))
+              (between (->uc "\" "))
+              (after (->uc ")")))
           (lambda (i value)
-            (@in (utf32-string-append
-                  before (number->utf32-string i)
+            (@in (uc-string-append
+                  before (number->uc-string i)
                   between (preprocessor-serialize value) after)))))
 
       (define-syntax define-macro
         (syntax-rules ()
           ((¶ set-or-push-macro-handler! macro-body)
            (let*-values (((name body) (evaluate macro-body))
-                         ((name) (if (bytevector? name)
-                                   (utf32-string->string name)
+                         ((name) (if (uc-string? name)
+                                   (uc-string->string name)
                                    name)))
              (unless (string? name)
                (error "macro name must be a string" name))
@@ -659,13 +649,13 @@
             (if define?
               ((macro-handler-procedure definition-handler)
                empty-string empty-string
-               (utf32-string-append
+               (uc-string-append
                 (preprocessor-serialize macro-name)
                 one-space
                 (preprocessor-serialize macro-body)))
               (remove-macro-handlers! macro-name)))))
 
-      (set-preprocessor-text! (utf32-string-copy text))
+      (set-preprocessor-text! (uc-string-copy text))
       (set-macro-handler! "dnl" dnl-handler)
       (set-macro-handler! "eval" eval-handler)
       (set-macro-handler! "hide" hide-handler)
@@ -682,7 +672,7 @@
 
       (apply-definitions-list definitions)
       (let loop ()
-        (cond ((= 0 (utf32-string-length (preprocessor-text)))
+        (cond ((= 0 (uc-string-length (preprocessor-text)))
                (unspecified-value))
               ((snobol-match (*quick-pattern*)
                              (preprocessor-text)) =>
@@ -737,7 +727,7 @@
                    (bracket-pairs)))))
          (parameterize ((current-output-port output-port))
            (process-text comment-style definitions
-                         (utf32-string-concatenate texts))))
+                         (uc-string-concatenate texts))))
         (unless use-stdout?
           (close-output-port output-port))))
 
@@ -789,15 +779,15 @@
                                  (lambda (entry)
                                    (and (proper-list? entry)
                                         (= 3 (length entry))
-                                        (utf32-string? (first entry))
+                                        (uc-string? (first entry))
                                         (boolean? (third entry))
                                         (or (not (third entry))
-                                            (utf32-string?
+                                            (uc-string?
                                              (second entry)))))
                                  value))
                      (error "expected a list of \
                              ((\"name\" \"body\" #t) ...)"
-                            (map (lambda (entry) (map utf32-> entry))
+                            (map (lambda (entry) (map uc-> entry))
                                  value)))
                    (setter! obj value))))
 
@@ -1123,7 +1113,7 @@ OTHER DEALINGS IN THE SOFTWARE.\n"
                     (unless (macro-name? (first def))
                       (display (*program-name*) port)
                       (display ": not a legal macro name: “" port)
-                      (display (utf32-> (first def)) port)
+                      (display (uc-> (first def)) port)
                       (display "”" port)
                       (newline port)
                       (try-help port)

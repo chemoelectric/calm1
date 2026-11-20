@@ -1,12 +1,18 @@
 ((author "Barry Schwartz")
  (synopsis "calm1: a macro-preprocessor whose goal is to reduce your anxieties")
- (version "1.0.2")
+ (version "1.0.3")
  (license "MIT")
  (category code-generation)
  (dependencies (chicken "6.0.0")
-               srfi-1 srfi-14 srfi-37 srfi-143
+               srfi-1
+               srfi-14
+               srfi-37
+               srfi-143
                r6rs-bytevectors)
- (test-dependencies scsh-process test)
+ (test-dependencies scsh-process
+                    test)
+ (component-options
+  (csc-options -O2 -d1 -w))
  (components
   (extension calm1-lib.version
              (source "calm1-lib/version.sld"))
@@ -14,34 +20,34 @@
              (source "calm1-lib/define-record-factory.sld"))
   (extension calm1-lib.random-fixnum
              (source "calm1-lib/random-fixnum.sld"))
-  (extension calm1-lib.utf32-string
-             (source "calm1-lib/utf32-string.sld"))
+  (extension calm1-lib.uc-string
+             (source "calm1-lib/uc-string.sld"))
   (extension calm1-lib.snobol-match
              (source "calm1-lib/snobol-match.sld")
-             (component-dependencies calm1-lib.utf32-string))
+             (component-dependencies calm1-lib.uc-string))
   (extension calm1-lib.snobol-char-set
              (source "calm1-lib/snobol-char-set.sld")
-             (component-dependencies calm1-lib.utf32-string))
+             (component-dependencies calm1-lib.uc-string))
   (extension calm1-lib.preprocessor-define-lookup
              (source "calm1-lib/preprocessor-define-lookup.sld"))
   (extension calm1-lib.preprocessor-macro-handler
              (source "calm1-lib/preprocessor-macro-handler.sld")
              (component-dependencies
               calm1-lib.define-record-factory
-              calm1-lib.utf32-string
+              calm1-lib.uc-string
               calm1-lib.preprocessor-define-lookup))
   (extension calm1-lib.preprocessor-variables
              (source "calm1-lib/preprocessor-variables.sld"))
   (extension calm1-lib.preprocessor-text
              (source "calm1-lib/preprocessor-text.sld")
-             (component-dependencies calm1-lib.utf32-string))
+             (component-dependencies calm1-lib.uc-string))
   (extension calm1-lib.path-list
              (source "calm1-lib/path-list.sld"))
   (extension calm1-lib.main
              (source "calm1-lib/main.sld")
              (component-dependencies
               calm1-lib.version
-              calm1-lib.utf32-string
+              calm1-lib.uc-string
               calm1-lib.snobol-match
               calm1-lib.snobol-char-set
               calm1-lib.random-fixnum

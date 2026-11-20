@@ -220,8 +220,8 @@
       (cond ((uc-string? str) (uc-string->string str))
             (else str)))
 
-    (define empty-string (string->uc-string ""))
-    (define (spaces n) (string->uc-string (make-string n #\x20)))
+    (define empty-string (make-uc-string 0))
+    (define (spaces n) (make-uc-string n #\space))
     (define one-space (spaces 1))
     (define macro-open (string->uc-string "(@ "))
     (define macro-close (string->uc-string ")"))

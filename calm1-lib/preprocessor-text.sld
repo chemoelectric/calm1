@@ -52,6 +52,11 @@
 
 ;;;---------------------------------------------------------------------
 
+    (define (really-write obj port)
+      (if (uc-string? obj)
+        (write (uc-string->string obj) port)
+        (write obj port)))
+
     (define *preprocessor-text*
       (make-parameter (list #f)))
 
@@ -81,7 +86,7 @@
 
     (define (@ins obj)
       (let ((f (open-output-string)))
-        (write obj f)
+        (really-write obj f)
         (set-preprocessor-text!
          (uc-string-append (preprocessor-stringize
                             (get-output-string f))
@@ -92,7 +97,7 @@
 
     (define (preprocessor-serialize obj)
       (let ((port (open-output-string)))
-        (write obj port)
+        (really-write obj port)
         (string->uc-string (get-output-string port))))
 
     (define (preprocessor-stringize x)
@@ -100,7 +105,7 @@
             ((string? x) (string->uc-string x))
             ((symbol? x) (symbol->uc-string x))
             ((number? x) (number->uc-string x))
-            ((char? x) (uc-string (char->integer x)))
+            ((char? x) (uc-string x))
             (else (preprocessor-serialize x))))
 
 ;;;---------------------------------------------------------------------
@@ -137,7 +142,7 @@
          (@outs obj (current-output-port)))
         ((obj port)
          (let ((f (open-output-string)))
-           (write obj f)
+           (really-write obj f)
            (@out (get-output-string f) port)
            (close-port f)))))
 

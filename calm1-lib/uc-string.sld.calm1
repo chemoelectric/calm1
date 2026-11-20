@@ -176,19 +176,19 @@
 
     (cond-expand
       ((or little-endian x86_64 x86-64)
-       (define-syntax endianness
+       (define-syntax endian
          (syntax-rules ()
-           ((endianness)
+           ((endian)
             'little))))
       (big-endian
-       (define-syntax endianness
+       (define-syntax endian
          (syntax-rules ()
-           ((endianness)
+           ((endian)
             'big))))
       (else
-       (define-syntax endianness
+       (define-syntax endian
          (syntax-rules ()
-           ((endianness)
+           ((endian)
             (native-endianness))))))
 
     (define (check-substring-bounds str start end)
@@ -253,7 +253,7 @@
                  i j))
         (unless (zero? len)
           (bytevector-u32-set! bv i (char->integer #\space)
-                               (endianness))
+                               (endian))
           (let loop ((filled 4))
             (unless (= filled len)
               (let ((copy-size (min filled (- len filled)))
@@ -328,7 +328,7 @@
         (check-intvector-index i start end)
         (bytevector-u32-ref (%intvector-buf ivec)
                             (* 4 (+ start i))
-                            (endianness))))
+                            (endian))))
 
     (define (intvector-set! ivec i value)
       (let ((start (%intvector-start ivec))
@@ -336,7 +336,7 @@
         (check-intvector-index i start end)
         (bytevector-u32-set! (%intvector-buf ivec)
                              (* 4 (+ start i)) value
-                             (endianness))))
+                             (endian))))
 
     (define (check-intvector-bounds ivec start end)
       (unless (<= 0 start end (intvector-length ivec))
@@ -458,17 +458,17 @@
            ((str)
             (construct
              (bytevector->intvector
-              (string->utf32 str (endianness)))))
+              (string->utf32 str (endian)))))
            ((str start end)
             (construct
              (bytevector->intvector
               (string->utf32 (string-copy str start end)
-                             (endianness)))))
+                             (endian)))))
            ((str start)
             (construct
              (bytevector->intvector
               (string->utf32 (string-copy str start)
-                             (endianness))))))))
+                             (endian))))))))
 
       (constructor>
        uc-string-copy
@@ -1042,7 +1042,7 @@
                              (= j (bytevector-length bv)))
                       bv
                       (bytevector-copy bv i j))))
-           (utf32->string bv (endianness))))
+           (utf32->string bv (endian))))
         ((str start)
          (uc-string->string str start (uc-string-length str)))
         ((str)

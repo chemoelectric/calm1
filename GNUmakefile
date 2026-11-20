@@ -22,7 +22,7 @@
 .DELETE_ON_ERROR:
 .DEFAULT_GOAL := default
 
-VERSION = 1.0.3
+VERSION = 1.0.4
 
 CHEMOELECTRIC = https://github.com/chemoelectric
 CALM1_REPO = $(CHEMOELECTRIC)/calm1

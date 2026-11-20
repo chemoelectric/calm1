@@ -138,10 +138,17 @@
           (calm1-lib define-record-factory))
   (cond-expand
     ((library (srfi 1))
-     (import (srfi 1)))
+     (import (only (srfi 1)
+                   not-pair? null-list? every
+                   unfold last drop-right)))
     ((library (scheme list))
-     (import (scheme list)))
-    (else (import (srfi srfi-1))))
+     (import (only (scheme list)
+                   not-pair? null-list? every
+                   unfold last drop-right)))
+    (else
+     (import (only (srfi srfi-1)
+                   not-pair? null-list? every
+                   unfold last drop-right))))
   (cond-expand
     ((library (scheme division))
      (import (scheme division)))
@@ -155,7 +162,15 @@
     ((library (rnrs bytevectors))
      (import (except (rnrs bytevectors)
                      bytevector-copy!)))
-    (chicken (import (r6rs bytevectors))))
+    (chicken (import (r6rs bytevectors)))
+    (gambit
+     ;; You can get the (r6rs bytevectors) implementation from Snow.
+     ;; For instance:
+     ;;
+     ;;   snow-chibi install --implementations=gambit r6rs.bytevectors
+     ;;
+     (import (except (r6rs bytevectors)
+                     bytevector-copy!))))
 
   (begin
 
